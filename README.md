@@ -47,16 +47,7 @@ Multiple plots and table will be generated, save them if you want. I prefer to k
 #### 3.4~3.7 Generate csv files with differential expression comparision
 `FindBothMarkers()` can split seurat data by conditions(aged vs. young), find All gene Markers differentially expressed between cluster, and generate csv files in **_output_** folder.
 
-Below is a example of csv file with first 6 rows.
-
-| row.name | p_val | avg_logFC | pct.1 | pct.2 | p_val_adj | cluster  | gene   | 
-| ----- | ------ | -------- | ----  | ----- | --------- | ------- | ------|
-| Trf   |   0   | 2.841893  | 1.000 | 0.686 | 0         | 0       | Trf   | 
-| Ptgds |   0   | 2.717962  | 1.000 | 0.964 | 0         | 0       | Ptgds |
-| Rdh5  |   0   | 2.624945  | 1.000 | 0.383 | 0         | 0       | Rdh5  |
-| Rgr   | 0   | 2.596064  | 1.000 | 0.641 | 0         | 0       | Rgr   |
-| Ttr   | 0   | 2.577672  | 1.000 | 0.991 | 0         | 0       | Ttr   | 
-| Rpe65 |   0   | 2.555434  | 0.999 | 0.279 | 0         | 0       | Rpe65 |
+Below is a example of `./output/mouse_eyes.aged.csv` file with first 6 rows.
 
 
 | row.name | p_val | avg_logFC | pct.1 | pct.2 | p_val_adj | cluster  | gene   | 
@@ -76,7 +67,7 @@ avg_logFC : log fold-chage of the average expression between the two groups. Pos
 pct.1 : The percentage of cells where the gene is detected in the first group.<br />
 pct.2 : The percentage of cells where the gene is detected in the second group.<br />
 p_val_adj : Adjusted p-value, based on bonferroni correction using all genes in the dataset.<br />
-cluster: original ident name in `./data/mouse_eyes_alignment.Rda`<br />
+cluster: either cell type name or original ident name in `./data/mouse_eyes_alignment.Rda`, will specify in later section<br />
 row.name and gene column are identical.<br />
 
 #### 3.4 Compare DE across all major cell types
@@ -102,8 +93,8 @@ Respectively,data is stored in :<br />
 `./output/Myeloid.cells.aged.csv` and `./output/Myeloid.cells.young.csv`<br />
 `./output/RPE.cells.aged.csv` and `./output/RPE.cells.young.csv`<br />
 etc...<br />
+Cluster are original ident name in `./data/mouse_eyes_alignment.Rda`, from 0 to 16. <br />
 
-Cluster names are original ident name in `./data/mouse_eyes_alignment.Rda`. <br />
 Only RPE(Retinal Pigment Epithelium) are further subjected to a second round of unsupervised analysis following the same approach, resulting in 3 subcluster a tSNE analysis with ~0.05 resolution. 
 
 #### 3.6 Compare DE in all major cell types across conditions
