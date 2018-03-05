@@ -60,53 +60,53 @@ Below is a example of csv file with first 6 rows.
 
 The results data frame has the following columns :
 
-p_val : p_val (unadjusted)
-avg_logFC : log fold-chage of the average expression between the two groups. Positive values indicate that the gene is more highly expressed in the first group.
-pct.1 : The percentage of cells where the gene is detected in the first group
-pct.2 : The percentage of cells where the gene is detected in the second group
-p_val_adj : Adjusted p-value, based on bonferroni correction using all genes in the dataset.
-cluster: original ident name in `./data/mouse_eyes_alignment.Rda`
-row.name and gene column are identical.
+p_val : p_val (unadjusted)<br />
+avg_logFC : log fold-chage of the average expression between the two groups. Positive values indicate that the gene is more highly expressed in the first group.<br />
+pct.1 : The percentage of cells where the gene is detected in the first group.<br />
+pct.2 : The percentage of cells where the gene is detected in the second group.<br />
+p_val_adj : Adjusted p-value, based on bonferroni correction using all genes in the dataset.<br />
+cluster: original ident name in `./data/mouse_eyes_alignment.Rda`<br />
+row.name and gene column are identical.<br />
 
 #### 3.4 Compare DE across all major cell types
-Data is stored in `./output/mouse_eyes.aged.csv` and `./output/mouse_eyes.young.csv`.
-Perictyes in 129_B6_aged   <——vs——>  all other cells except Perictyes in 129_B6_aged
-Endothelial in 129_B6_aged  <——vs——>  all other cells except Endothelial in 129_B6_aged
-Myeloid Cells in 129_B6_aged   <——vs——>  all other cells except Myeloid Cells in 129_B6_aged
+Data is stored in `./output/mouse_eyes.aged.csv` and `./output/mouse_eyes.young.csv`.<br />
+Perictyes in 129_B6_aged   <——vs——>  all other cells except Perictyes in 129_B6_aged<br />
+Endothelial in 129_B6_aged  <——vs——>  all other cells except Endothelial in 129_B6_aged<br />
+Myeloid Cells in 129_B6_aged   <——vs——>  all other cells except Myeloid Cells in 129_B6_aged<br />
 etc...
 
 #### 3.5 Compare DE between subcluster within all major cell types
 
-Perictyes subclusters 1 in 129_B6_aged   <——vs——>  all other subclusters in Perictyes except  1 in 129_B6_aged
-etc...
+Perictyes subclusters 1 in 129_B6_aged   <——vs——>  all other subclusters in Perictyes except  1 in 129_B6_aged<br />
+etc...<br />
 Data is stored in `./output/Pericytes.aged.csv` and `./output/Pericytes.young.csv`. 
 
-Endothelial subclusters 1 in 129_B6_aged  <——vs——>  all other subclusters in Endothelial except 1 in 129_B6_aged
-etc...
-Data is stored in `./output/Endothelial.Cells.aged.csv` and `./output/Endothelial.Cells.young.csv`.
+Endothelial subclusters 1 in 129_B6_aged  <——vs——>  all other subclusters in Endothelial except 1 in 129_B6_aged<br />
+etc...<br />
+Data is stored in `./output/Endothelial.Cells.aged.csv` and `./output/Endothelial.Cells.young.csv`.<br />
 
-Myeloid Cells  subclusters 1 in 129_B6_aged   <——vs——>  all other subclusters in Myeloid Cells except  1 in 129_B6_aged
-etc...
+Myeloid Cells  subclusters 1 in 129_B6_aged   <——vs——>  all other subclusters in Myeloid Cells except  1 in 129_B6_aged<br />
+etc...<br />
 Data  is stored in `./output/Myeloid.cells.aged.csv` and `./output/Myeloid.cells.young.csv`
 
-RPE cells subclusters 1 in 129_B6_aged   <——vs——>  all other subclusters in RPE Cells except  1 in 129_B6_aged
-etc...
+RPE cells subclusters 1 in 129_B6_aged   <——vs——>  all other subclusters in RPE Cells except  1 in 129_B6_aged<br />
+etc...<br />
 Data  is stored in `./output/RPE.cells.aged.csv` and `./output/RPE.cells.young.csv`
 
 We also need the other kind of analysis you mention:
 
-Perictyes in 129_B6   <——vs——>  Perictyes in 129_B6_aged
-Endothelial in 129_B6 <——vs——>  Endothelial in 129_B6_aged
-Myeloid Cells in 129_B6   <——vs——>  Myeloid Cells in 129_B6_aged
+Perictyes in 129_B6   <——vs——>  Perictyes in 129_B6_aged<br />
+Endothelial in 129_B6 <——vs——>  Endothelial in 129_B6_aged<br />
+Myeloid Cells in 129_B6   <——vs——>  Myeloid Cells in 129_B6_aged<br />
 etc...
 
  and the same for the subclusters:
 
-Perictyes subcluster 1 in 129_B6   <——vs——>  Perictyes subcluster 1 in 129_B6_aged
-Perictyes subcluster 2 in 129_B6   <——vs——>  Perictyes subcluster 2 in 129_B6_aged
+Perictyes subcluster 1 in 129_B6   <——vs——>  Perictyes subcluster 1 in 129_B6_aged<br />
+Perictyes subcluster 2 in 129_B6   <——vs——>  Perictyes subcluster 2 in 129_B6_aged<br />
 etc...
-Endothelial subcluster 1 in 129_B6 <——vs——>  Endothelial subcluster 1 in 129_B6_aged
-Endothelial subcluster 2 in 129_B6 <——vs——>  Endothelial subcluster 2 in 129_B6_aged
+Endothelial subcluster 1 in 129_B6 <——vs——>  Endothelial subcluster 1 in 129_B6_aged<br />
+Endothelial subcluster 2 in 129_B6 <——vs——>  Endothelial subcluster 2 in 129_B6_aged<br />
 etc...
 and the same for all subclusters in Myeloid cells and RPE cells.
 
