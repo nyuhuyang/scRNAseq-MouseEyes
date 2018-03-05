@@ -41,10 +41,15 @@ Retinal pigment epitheliums were identified by Rlbp1 and Rpe65.<br />
 Multiple plots and table will be generated, save them if you want. I prefer to keep the original ident name of `mouse_eyes_alignment.Rda` intact for further downstream analysis.
 
 ### Differential_analysis.R
+#### Visualization
 `TSNEPlot()`, `SplitDotPlotGG()`,`ggplot()+LabelUR()+LabelLR()` are implemented for visualising differential expressed genes across conditions.
-`FindBothMarkers()` can split seurat data by conditions(aged vs. young), find All gene Markers, and generate csv files in **_output_** folder.
 
-| gene | p_val | avg_logFC | pct.1 | pct.2 | p_val_adj |cluster  |gene   | 
+#### Generate csv files with differential expression comparision
+`FindBothMarkers()` can split seurat data by conditions(aged vs. young), find All gene Markers differentially expressed between cluster, and generate csv files in **_output_** folder.
+
+Below is a example of csv file with first 6 rows.
+
+| row.name | p_val | avg_logFC | pct.1 | pct.2 | p_val_adj |cluster  |gene   | 
 | ----- | ------ | -------- | ----  | ----- | --------- | ------- | ------|
 | Trf   |   0   | 2.841893  | 1.000 | 0.686 | 0         | 0       | Trf   | 
 | Ptgds |   0   | 2.717962  | 1.000 | 0.964 | 0         | 0       | Ptgds |
@@ -52,6 +57,14 @@ Multiple plots and table will be generated, save them if you want. I prefer to k
 | Rgr   |   0   | 2.596064  | 1.000 | 0.641 | 0         | 0       | Rgr   |
 | Ttr   |   0   | 2.577672  | 1.000 | 0.991 | 0         | 0       | Ttr   | 
 | Rpe65 |   0   | 2.555434  | 0.999 | 0.279 | 0         | 0       | Rpe65 |
+
+The results data frame has the following columns :
+
+p_val : p_val (unadjusted)
+avg_logFC : log fold-chage of the average expression between the two groups. Positive values indicate that the gene is more highly expressed in the first group.
+pct.1 : The percentage of cells where the gene is detected in the first group
+pct.2 : The percentage of cells where the gene is detected in the second group
+p_val_adj : Adjusted p-value, based on bonferroni correction using all genes in the dataset.
 
 
 
