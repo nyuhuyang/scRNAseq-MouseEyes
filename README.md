@@ -54,8 +54,8 @@ Below is a example of csv file with first 6 rows.
 | Trf   |   0   | 2.841893  | 1.000 | 0.686 | 0         | 0       | Trf   | 
 | Ptgds |   0   | 2.717962  | 1.000 | 0.964 | 0         | 0       | Ptgds |
 | Rdh5  |   0   | 2.624945  | 1.000 | 0.383 | 0         | 0       | Rdh5  |
-| Rgr   |   0   | 2.596064  | 1.000 | 0.641 | 0         | 0       | Rgr   |
-| Ttr   |   0   | 2.577672  | 1.000 | 0.991 | 0         | 0       | Ttr   | 
+| Rgr   |  0   | 2.596064  | 1.000 | 0.641 | 0         | 0       | Rgr   |
+| Ttr   |  0   | 2.577672  | 1.000 | 0.991 | 0         | 0       | Ttr   | 
 | Rpe65 |   0   | 2.555434  | 0.999 | 0.279 | 0         | 0       | Rpe65 |
 
 The results data frame has the following columns :
@@ -73,7 +73,7 @@ row.name and gene column are identical.<br />
 Perictyes in 129_B6_aged   <——vs——>  all other cells except Perictyes in 129_B6_aged<br />
 Endothelial in 129_B6_aged  <——vs——>  all other cells except Endothelial in 129_B6_aged<br />
 Myeloid Cells in 129_B6_aged   <——vs——>  all other cells except Myeloid Cells in 129_B6_aged<br />
-etc...
+etc...<br />
 Data is stored in `./output/mouse_eyes.aged.csv` and `./output/mouse_eyes.young.csv`.<br />
 Cluster names are cell type name.
 
@@ -83,12 +83,13 @@ Perictyes subclusters 1 in 129_B6_aged   <——vs——>  all other subclusters
 Endothelial subclusters 1 in 129_B6_aged  <——vs——>  all other subclusters in Endothelial except 1 in 129_B6_aged<br />
 Myeloid Cells  subclusters 1 in 129_B6_aged   <——vs——>  all other subclusters in Myeloid Cells except  1 in 129_B6_aged<br />
 RPE cells subclusters 1 in 129_B6_aged   <——vs——>  all other subclusters in RPE Cells except  1 in 129_B6_aged<br />
-etc...
+etc...<br />
 
-Data is stored in `./output/Pericytes.aged.csv` and `./output/Pericytes.young.csv`. <br />
-Data is stored in `./output/Endothelial.Cells.aged.csv` and `./output/Endothelial.Cells.young.csv`.<br />
-Data  is stored in `./output/Myeloid.cells.aged.csv` and `./output/Myeloid.cells.young.csv`<br />
-Data  is stored in `./output/RPE.cells.aged.csv` and `./output/RPE.cells.young.csv`<br />
+Respectively,data is stored in :<br />
+`./output/Pericytes.aged.csv` and `./output/Pericytes.young.csv`. <br />
+`./output/Endothelial.Cells.aged.csv` and `./output/Endothelial.Cells.young.csv`.<br />
+`./output/Myeloid.cells.aged.csv` and `./output/Myeloid.cells.young.csv`<br />
+`./output/RPE.cells.aged.csv` and `./output/RPE.cells.young.csv`<br />
 etc...<br />
 
 Cluster names are original ident name in `./data/mouse_eyes_alignment.Rda`
