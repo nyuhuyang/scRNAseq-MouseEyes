@@ -12,7 +12,7 @@ Chromium single-cell RNA-seq outputs were processed by Cell Ranger analysis pipe
 
 ## How to use this repository
 
-### Software Setup
+#### Software Setup
 R version 3.4.3 (Did't test other versions)<br />
 dplyr_0.7.4 (Did't test other versions)<br />
 Seurat_2.2.1 (Must be >2.2.0 )<br />
@@ -20,14 +20,14 @@ Seurat_2.2.1 (Must be >2.2.0 )<br />
 After pulling this repository, create folders **_data_** and **_output_** in the top working folder.
 Move Cell Ranger analysis results into **_data_** folder.
 
-### Seurat_setup.R
+### 1. Seurat_setup.R
 Unsupervised cell clustering analysis was carried out using the Seurat 2.2 R package. Cells with <500 genes and genes detected within <3 cells were excluded from the analysis. Gene expression raw counts were normalized following a global-scaling normalization method with a scale factor of 10,000 and a log transformation, using the Seurat NormalizeData function. The top 1000 highly variable genes from young C57BL/6J and aged C57BL/6J datasets were selected, followed by a canonical correlation analysis (CCA) to identify common sources of variation between the two datasets and minimize the batch effect. The first 20 CCA results were chosen for principal component analysis (PCA). Cells were used for 2-dimensional t-Distributed Stochastic Neighbor Embedding (tSNE) (ref van der maaten and hinton 2008) with 0.8 resolution.
 
  After running this script, a `mouse_eyes_alignment.Rda` file will be generated inside **_data_** folder.
  Do not modify any files in **_data_** folder.
  
  
-### Identify_Cell_Types_Manually.R
+### 2. Identify_Cell_Types_Manually.R
 All clusters are examed against 122(number may change) CD marker genes.
 All cell types are predicted by at least two marker genes with the adjusted p-value smaller than 10^-30.
 
@@ -40,16 +40,16 @@ Retinal pigment epitheliums were identified by Rlbp1 and Rpe65.<br />
 
 Multiple plots and table will be generated, save them if you want. I prefer to keep the original ident name of `mouse_eyes_alignment.Rda` intact for further downstream analysis.
 
-### Differential_analysis.R
-#### Visualization
+### 3. Differential_analysis.R
+#### 3.1~3.3 Visualization
 `TSNEPlot()`, `SplitDotPlotGG()`,`ggplot()+LabelUR()+LabelLR()` are implemented for visualising differential expressed genes across conditions.
 
-#### Generate csv files with differential expression comparision
+#### 3.4 Generate csv files with differential expression comparision
 `FindBothMarkers()` can split seurat data by conditions(aged vs. young), find All gene Markers differentially expressed between cluster, and generate csv files in **_output_** folder.
 
 Below is a example of csv file with first 6 rows.
 
-| row.name | p_val | avg_logFC | pct.1 | pct.2 | p_val_adj |cluster  |gene   | 
+| row.name | p_val | avg_logFC | pct.1 | pct.2 | p_val_adj | cluster  | gene   | 
 | ----- | ------ | -------- | ----  | ----- | --------- | ------- | ------|
 | Trf   |   0   | 2.841893  | 1.000 | 0.686 | 0         | 0       | Trf   | 
 | Ptgds |   0   | 2.717962  | 1.000 | 0.964 | 0         | 0       | Ptgds |
@@ -65,7 +65,39 @@ avg_logFC : log fold-chage of the average expression between the two groups. Pos
 pct.1 : The percentage of cells where the gene is detected in the first group
 pct.2 : The percentage of cells where the gene is detected in the second group
 p_val_adj : Adjusted p-value, based on bonferroni correction using all genes in the dataset.
+cluster: original ident name in `./data/mouse_eyes_alignment.Rda`
+row.name and gene column are identical.
 
+First, we need exactly the same analysis you did previously with the clusters:
+
+Perictyes in 129_B6_aged   <——vs——>  all other cells except Perictyes in 129_B6_aged
+Endothelial in 129_B6_aged  <——vs——>  all other cells except Endothelial in 129_B6_aged
+Myeloid Cells in 129_B6_aged   <——vs——>  all other cells except Myeloid Cells in 129_B6_aged
+etc...
+
+and subclusters:
+
+Perictyes subclusters 1 in 129_B6_aged   <——vs——>  all other subclusters in Perictyes except  1 in 129_B6_aged
+Endothelial subclusters 1 in 129_B6_aged  <——vs——>  all other subclusters in Endothelial except 1 in 129_B6_aged
+Myeloid Cells  subclusters 1 in 129_B6_aged   <——vs——>  all other subclusters in Myeloid Cells except  1 in 129_B6_aged
+RPE cells subclusters 1 in 129_B6_aged   <——vs——>  all other subclusters in RPE Cells except  1 in 129_B6_aged
+
+We also need the other kind of analysis you mention:
+
+Perictyes in 129_B6   <——vs——>  Perictyes in 129_B6_aged
+Endothelial in 129_B6 <——vs——>  Endothelial in 129_B6_aged
+Myeloid Cells in 129_B6   <——vs——>  Myeloid Cells in 129_B6_aged
+etc...
+
+ and the same for the subclusters:
+
+Perictyes subcluster 1 in 129_B6   <——vs——>  Perictyes subcluster 1 in 129_B6_aged
+Perictyes subcluster 2 in 129_B6   <——vs——>  Perictyes subcluster 2 in 129_B6_aged
+etc...
+Endothelial subcluster 1 in 129_B6 <——vs——>  Endothelial subcluster 1 in 129_B6_aged
+Endothelial subcluster 2 in 129_B6 <——vs——>  Endothelial subcluster 2 in 129_B6_aged
+etc...
+and the same for all subclusters in Myeloid cells and RPE cells.
 
 
 Cells contained in cluster 11 (hematopoietic cells) were further subjected to a second round of unsupervised analysis following the same approach, resulting in a tSNE analysis with ~0.1 resolution. The modified Seurat function FindAllMarkers was used to calculate average differential expression among cell clusters. The p-value was calculated using likelihood-ratio test and adjusted by Benjamini-Hochberg method.
