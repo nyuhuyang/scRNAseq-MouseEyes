@@ -54,8 +54,8 @@ Below is a example of csv file with first 6 rows.
 | Trf   |   0   | 2.841893  | 1.000 | 0.686 | 0         | 0       | Trf   | 
 | Ptgds |   0   | 2.717962  | 1.000 | 0.964 | 0         | 0       | Ptgds |
 | Rdh5  |   0   | 2.624945  | 1.000 | 0.383 | 0         | 0       | Rdh5  |
-| Rgr   |  0   | 2.596064  | 1.000 | 0.641 | 0         | 0       | Rgr   |
-| Ttr   |  0   | 2.577672  | 1.000 | 0.991 | 0         | 0       | Ttr   | 
+| Rgr   | 0   | 2.596064  | 1.000 | 0.641 | 0         | 0       | Rgr   |
+| Ttr   | 0   | 2.577672  | 1.000 | 0.991 | 0         | 0       | Ttr   | 
 | Rpe65 |   0   | 2.555434  | 0.999 | 0.279 | 0         | 0       | Rpe65 |
 
 The results data frame has the following columns :
@@ -92,7 +92,7 @@ Respectively,data is stored in :<br />
 `./output/RPE.cells.aged.csv` and `./output/RPE.cells.young.csv`<br />
 etc...<br />
 
-Cluster names are original ident name in `./data/mouse_eyes_alignment.Rda`
+Cluster names are original ident name in `./data/mouse_eyes_alignment.Rda`. <br />
 Only RPE(Retinal Pigment Epithelium) are further subjected to a second round of unsupervised analysis following the same approach, resulting in 3 subcluster a tSNE analysis with ~0.05 resolution. 
 
 #### 3.6 Compare DE in all major cell types across conditions
