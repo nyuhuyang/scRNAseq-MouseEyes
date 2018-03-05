@@ -71,6 +71,42 @@ FilterCellsBy <- function(object,name){
         print(table(object.name@meta.data$protocol)) #test
         return(object.name)
 }
+
+# find and print differentially expressed genes across conditions ================
+FindBothMarkers <- function(object = mouse_eyes){
+  all.cell <- FetchData(object,"conditions")
+  cell.young <- rownames(all.cell)[all.cell$conditions =="young"]
+  cell.aged <- rownames(all.cell)[all.cell$conditions =="aged"]
+  
+  object.young <- SubsetData(object = object,
+                             cells.use =cell.young)
+  object.aged <- SubsetData(object = object,
+                            cells.use =cell.aged)
+  object.young.markers <- FindAllMarkers(object = object.young,
+                                         thresh.use = -Inf,
+                                         test.use = "bimod",
+                                         min.pct = -Inf,
+                                         min.diff.pct = -Inf,
+                                         min.cells = -Inf)
+  object.aged.markers <- FindAllMarkers(object = object.aged, 
+                                        thresh.use = -Inf,
+                                        test.use = "bimod",
+                                        min.pct = -Inf,
+                                        min.diff.pct = -Inf,
+                                        min.cells = -Inf)
+  object.markers <- list(young = object.young.markers,
+                         aged = object.aged.markers)
+  mapply(write.csv,
+         x= object.markers,
+         #convert variable (object) name into String
+         file=paste0("./output/",
+                     deparse(substitute(object)), 
+                     ".",names(object.markers),
+                     ".csv"))
+  return(object.markers)
+}
+
+
 LogNormalize
 # modified GenePlot
 # GenePlot.1(do.hover = TRUE) will return ggplot 
@@ -185,6 +221,12 @@ Log2fold <- function(object){
 # MouseGenes
 # turn list of gene character to uniform mouse gene list format
 MouseGenes <- function(seurat.object,marker.genes){
+        if(missing(seurat.object)) 
+          stop("A seurat object must be provided first")
+        if(class(seurat.object) != "seurat") 
+          stop("A seurat object must be provided first")
+        if(missing(marker.genes)) 
+          stop("A list of marker genes must be provided")
         # marker.genes =c("Cdh5,Pecam1,Flt1,Vwf,Plvap,Kdr") for example
         marker.genes <- as.character(marker.genes)
         marker.genes <- unlist(strsplit(marker.genes,","))
