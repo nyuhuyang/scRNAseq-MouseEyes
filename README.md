@@ -58,6 +58,17 @@ Below is a example of csv file with first 6 rows.
 | Ttr   | 0   | 2.577672  | 1.000 | 0.991 | 0         | 0       | Ttr   | 
 | Rpe65 |   0   | 2.555434  | 0.999 | 0.279 | 0         | 0       | Rpe65 |
 
+
+| row.name | p_val | avg_logFC | pct.1 | pct.2 | p_val_adj | cluster  | gene   | 
+| ----- | ------ | -------- | ----  | ----- | --------- | ------- | ------|
+|  Plvap   |  0 | 3.251091 | 0.950 | 0.239     |     0 | Endothelial Cells  | Plvap
+|  Cldn5   |  0 | 2.898564 | 0.858 | 0.071     |     0 | Endothelial Cells  | Cldn5
+|  Plpp1   | 0 | 2.794314 | 0.902 | 0.153     |     0 | Endothelial Cells  | Plpp1
+|  Egfl7   |  0 | 2.754571 | 0.984 | 0.092    |      0 | Endothelial Cells  | Egfl7
+| Igfbp3   |  0 | 2.559527 | 0.725 | 0.053     |     0 | Endothelial Cells | Igfbp3
+|    Eng   |  0 | 2.489143 | 0.956 | 0.153     |    0 | Endothelial Cells   | Eng
+
+
 The results data frame has the following columns :
 
 p_val : p_val (unadjusted)<br />
