@@ -69,38 +69,39 @@ cluster: original ident name in `./data/mouse_eyes_alignment.Rda`<br />
 row.name and gene column are identical.<br />
 
 #### 3.4 Compare DE across all major cell types
-Data is stored in `./output/mouse_eyes.aged.csv` and `./output/mouse_eyes.young.csv`.<br />
+
 Perictyes in 129_B6_aged   <——vs——>  all other cells except Perictyes in 129_B6_aged<br />
 Endothelial in 129_B6_aged  <——vs——>  all other cells except Endothelial in 129_B6_aged<br />
 Myeloid Cells in 129_B6_aged   <——vs——>  all other cells except Myeloid Cells in 129_B6_aged<br />
 etc...
+Data is stored in `./output/mouse_eyes.aged.csv` and `./output/mouse_eyes.young.csv`.<br />
+Cluster names are cell type name.
 
 #### 3.5 Compare DE between subcluster within all major cell types
 
 Perictyes subclusters 1 in 129_B6_aged   <——vs——>  all other subclusters in Perictyes except  1 in 129_B6_aged<br />
-etc...<br />
-Data is stored in `./output/Pericytes.aged.csv` and `./output/Pericytes.young.csv`. 
-
 Endothelial subclusters 1 in 129_B6_aged  <——vs——>  all other subclusters in Endothelial except 1 in 129_B6_aged<br />
-etc...<br />
-Data is stored in `./output/Endothelial.Cells.aged.csv` and `./output/Endothelial.Cells.young.csv`.<br />
-
 Myeloid Cells  subclusters 1 in 129_B6_aged   <——vs——>  all other subclusters in Myeloid Cells except  1 in 129_B6_aged<br />
-etc...<br />
-Data  is stored in `./output/Myeloid.cells.aged.csv` and `./output/Myeloid.cells.young.csv`
-
 RPE cells subclusters 1 in 129_B6_aged   <——vs——>  all other subclusters in RPE Cells except  1 in 129_B6_aged<br />
-etc...<br />
-Data  is stored in `./output/RPE.cells.aged.csv` and `./output/RPE.cells.young.csv`
+etc...
 
-We also need the other kind of analysis you mention:
+Data is stored in `./output/Pericytes.aged.csv` and `./output/Pericytes.young.csv`. <br />
+Data is stored in `./output/Endothelial.Cells.aged.csv` and `./output/Endothelial.Cells.young.csv`.<br />
+Data  is stored in `./output/Myeloid.cells.aged.csv` and `./output/Myeloid.cells.young.csv`<br />
+Data  is stored in `./output/RPE.cells.aged.csv` and `./output/RPE.cells.young.csv`<br />
+etc...<br />
+
+Cluster names are original ident name in `./data/mouse_eyes_alignment.Rda`
+Only RPE(Retinal Pigment Epithelium) are further subjected to a second round of unsupervised analysis following the same approach, resulting in 3 subcluster a tSNE analysis with ~0.05 resolution. 
+
+#### 3.6 Compare DE in all major cell types across conditions
 
 Perictyes in 129_B6   <——vs——>  Perictyes in 129_B6_aged<br />
 Endothelial in 129_B6 <——vs——>  Endothelial in 129_B6_aged<br />
 Myeloid Cells in 129_B6   <——vs——>  Myeloid Cells in 129_B6_aged<br />
 etc...
 
- and the same for the subclusters:
+#### 3.7 Compare DE in all major cell types across conditions
 
 Perictyes subcluster 1 in 129_B6   <——vs——>  Perictyes subcluster 1 in 129_B6_aged<br />
 Perictyes subcluster 2 in 129_B6   <——vs——>  Perictyes subcluster 2 in 129_B6_aged<br />
@@ -111,4 +112,4 @@ etc...
 and the same for all subclusters in Myeloid cells and RPE cells.
 
 
-Cells contained in cluster 11 (hematopoietic cells) were further subjected to a second round of unsupervised analysis following the same approach, resulting in a tSNE analysis with ~0.1 resolution. The modified Seurat function FindAllMarkers was used to calculate average differential expression among cell clusters. The p-value was calculated using likelihood-ratio test and adjusted by Benjamini-Hochberg method.
+The modified Seurat function FindAllMarkers was used to calculate average differential expression among cell clusters. The p-value was calculated using likelihood-ratio test and adjusted by Benjamini-Hochberg method.
