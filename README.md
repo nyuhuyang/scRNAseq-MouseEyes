@@ -44,7 +44,7 @@ Multiple plots and table will be generated, save them if you want. I prefer to k
 #### 3.1~3.3 Visualization
 `TSNEPlot()`, `SplitDotPlotGG()`,`ggplot()+LabelUR()+LabelLR()` are implemented for visualising differential expressed genes across conditions.
 
-#### 3.4 Generate csv files with differential expression comparision
+#### 3.4~3.7 Generate csv files with differential expression comparision
 `FindBothMarkers()` can split seurat data by conditions(aged vs. young), find All gene Markers differentially expressed between cluster, and generate csv files in **_output_** folder.
 
 Below is a example of csv file with first 6 rows.
@@ -68,19 +68,30 @@ p_val_adj : Adjusted p-value, based on bonferroni correction using all genes in 
 cluster: original ident name in `./data/mouse_eyes_alignment.Rda`
 row.name and gene column are identical.
 
-First, we need exactly the same analysis you did previously with the clusters:
-
+#### 3.4 Compare DE across all major cell types
+Data is stored in `./output/mouse_eyes.aged.csv` and `./output/mouse_eyes.young.csv`.
 Perictyes in 129_B6_aged   <——vs——>  all other cells except Perictyes in 129_B6_aged
 Endothelial in 129_B6_aged  <——vs——>  all other cells except Endothelial in 129_B6_aged
 Myeloid Cells in 129_B6_aged   <——vs——>  all other cells except Myeloid Cells in 129_B6_aged
 etc...
 
-and subclusters:
+#### 3.5 Compare DE between subcluster within all major cell types
 
 Perictyes subclusters 1 in 129_B6_aged   <——vs——>  all other subclusters in Perictyes except  1 in 129_B6_aged
+etc...
+Data is stored in `./output/Pericytes.aged.csv` and `./output/Pericytes.young.csv`. 
+
 Endothelial subclusters 1 in 129_B6_aged  <——vs——>  all other subclusters in Endothelial except 1 in 129_B6_aged
+etc...
+Data is stored in `./output/Endothelial.Cells.aged.csv` and `./output/Endothelial.Cells.young.csv`.
+
 Myeloid Cells  subclusters 1 in 129_B6_aged   <——vs——>  all other subclusters in Myeloid Cells except  1 in 129_B6_aged
+etc...
+Data  is stored in `./output/Myeloid.cells.aged.csv` and `./output/Myeloid.cells.young.csv`
+
 RPE cells subclusters 1 in 129_B6_aged   <——vs——>  all other subclusters in RPE Cells except  1 in 129_B6_aged
+etc...
+Data  is stored in `./output/RPE.cells.aged.csv` and `./output/RPE.cells.young.csv`
 
 We also need the other kind of analysis you mention:
 
