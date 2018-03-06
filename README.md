@@ -1,13 +1,5 @@
 # scRNAseq-MouseEyes
 
- 
-| Title | Single cell transcriptomics of adult and young mouse RPE/choroid 
-| Author | Yang Hu
-| Department | Physiology and Biophysics
-| University | Weill Cornell Medicine
-| Email | yah2014@med.cornell.edu
-
-
 ## Research Background
 The choroid is a highly vascularized layer of the eye localized between the sclera and the outermost retinal layer, the retinal pigment epithelium (RPE). Blood supplied by choroidal circulation is the main source of oxygen and nutrients for the RPE and photoreceptors, as well as the main evacuation route for retinal waste. On the other hand, the RPE provides essential support functions for photoreceptor homeostasis and visual function. Thus, it is not surprising that RPE/choroid alterations are present in a vast range of posterior ophthalmic diseases including uveal inflammation and macular degenerative diseases such as Best disease, Stargardt disease and age-related macular degeneration (AMD).
 
