@@ -2,7 +2,6 @@
 
  
 | Title | Single cell transcriptomics of adult and young mouse RPE/choroid 
-| ----- | ----------------------------------------
 | Author | Yang Hu
 | Department | Physiology and Biophysics
 | University | Weill Cornell Medicine
