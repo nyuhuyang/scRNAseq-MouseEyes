@@ -72,8 +72,45 @@ FilterCellsBy <- function(object,name){
         return(object.name)
 }
 
+# find and print differentially expressed genes within all major cell types ================
+# combine SubsetData, FindAllMarkers, write.csv parallely
+FindAllMarkers.Write <- function(object = mouse_eyes){
+  all.cell <- FetchData(object,"conditions")
+  cell.young <- rownames(all.cell)[all.cell$conditions =="young"]
+  cell.aged <- rownames(all.cell)[all.cell$conditions =="aged"]
+  
+  object.young <- SubsetData(object = object,
+                             cells.use =cell.young)
+  object.aged <- SubsetData(object = object,
+                            cells.use =cell.aged)
+  object.young.markers <- FindAllMarkers(object = object.young,
+                                         thresh.use = -Inf,
+                                         test.use = "bimod",
+                                         min.pct = -Inf,
+                                         min.diff.pct = -Inf,
+                                         min.cells = -Inf)
+  object.aged.markers <- FindAllMarkers(object = object.aged, 
+                                        thresh.use = -Inf,
+                                        test.use = "bimod",
+                                        min.pct = -Inf,
+                                        min.diff.pct = -Inf,
+                                        min.cells = -Inf)
+  object.markers <- list(young = object.young.markers,
+                         aged = object.aged.markers)
+  mapply(write.csv,
+         x= object.markers,
+         #convert variable (object) name into String
+         file=paste0("./output/",
+                     deparse(substitute(object)), 
+                     ".",names(object.markers),
+                     ".csv"))
+  return(object.markers)
+}
+
+
 # find and print differentially expressed genes across conditions ================
-FindBothMarkers <- function(object = mouse_eyes){
+# combine FindMarkers and write.csv
+FindMarkers.Write <- function(object = mouse_eyes){
   all.cell <- FetchData(object,"conditions")
   cell.young <- rownames(all.cell)[all.cell$conditions =="young"]
   cell.aged <- rownames(all.cell)[all.cell$conditions =="aged"]

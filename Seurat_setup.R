@@ -24,7 +24,7 @@ conditions <- c("young", "aged")
 for(i in 1:length(protocols)){
   mouse_eyes_raw[[i]] <- Read10X(data.dir = paste0("./data/",
                               protocols[i],"/outs/filtered_gene_bc_matrices/mm10/"))
-  colnames(mouse_eyes_raw[[i]]) <- paste0(protocols[i],
+  colnames(mouse_eyes_raw[[i]]) <- paste0(conditions[i],
                                           "_",colnames(mouse_eyes_raw[[i]]))
 }
 mouse_eyes_Seurat <- lapply(mouse_eyes_raw, CreateSeuratObject,
@@ -51,8 +51,6 @@ for(i in 1:length(conditions)){
 length(genes.use) # 1/10 of total sample size 11212
 
 #======1.2 Perform a canonical correlation analysis (CCA) =========================
-
-# lastly, we set the 'protocol' in each dataset for easy identification
 # run a canonical correlation analysis to identify common sources
 # of variation between the two datasets.
 mouse_eyes <- RunCCA(mouse_eyes_Seurat[[1]],mouse_eyes_Seurat[[2]],

@@ -38,14 +38,14 @@ Melanocytes were identified by Mlana and Pmel.<br />
 Myelinating Schwann cells were identified by Mbp and Mpz.<br />
 Retinal pigment epitheliums were identified by Rlbp1 and Rpe65.<br />
 
-Multiple plots and table will be generated, save them if you want. I prefer to keep the original ident name of `mouse_eyes_alignment.Rda` intact for further downstream analysis.
+Multiple plots and table will be generated, save them if you want. I prefer to keep the original identity of `mouse_eyes_alignment.Rda` intact for further downstream analysis.
 
 ### 3. Differential_analysis.R
 #### 3.1~3.3 Visualization
 `TSNEPlot()`, `SplitDotPlotGG()`,`ggplot()+LabelUR()+LabelLR()` are implemented for visualising differential expressed genes across conditions.
 
 #### 3.4~3.7 Generate csv files with differential expression comparision
-`FindBothMarkers()` can split seurat data by conditions(aged vs. young), find All gene Markers differentially expressed between cluster, and generate csv files in **_output_** folder.
+`FindAllMarkers.Write()` can split seurat data by conditions(aged vs. young), find All gene Markers differentially expressed between cluster, and generate csv files in **_output_** folder.
 
 Below is a example of `./output/mouse_eyes.aged.csv` file with first 6 rows.
 
@@ -62,15 +62,15 @@ Below is a example of `./output/mouse_eyes.aged.csv` file with first 6 rows.
 
 The results data frame has the following columns :
 
-p_val : p_val (unadjusted)<br />
+p_val : p_val (unadjusted) is calculated using likelihood-ratio test for single cell gene expression, (McDavid et al., Bioinformatics, 2013) <br />
 avg_logFC : log fold-chage of the average expression between the two groups. Positive values indicate that the gene is more highly expressed in the first group.<br />
 pct.1 : The percentage of cells where the gene is detected in the first group.<br />
 pct.2 : The percentage of cells where the gene is detected in the second group.<br />
 p_val_adj : Adjusted p-value, based on bonferroni correction using all genes in the dataset.<br />
-cluster: either cell type name or original ident name in `./data/mouse_eyes_alignment.Rda`, will specify in later section<br />
+cluster: either cell type name or original identity in `./data/mouse_eyes_alignment.Rda`, will specify in later section.<br />
 row.name and gene column are identical.<br />
 
-#### 3.4 Compare DE across all major cell types
+#### 3.4 Compare differential expression across all major cell types
 
 Perictyes in 129_B6_aged   <——vs——>  all other cells except Perictyes in 129_B6_aged<br />
 Endothelial in 129_B6_aged  <——vs——>  all other cells except Endothelial in 129_B6_aged<br />
@@ -79,7 +79,7 @@ etc...<br />
 Data is stored in `./output/mouse_eyes.aged.csv` and `./output/mouse_eyes.young.csv`.<br />
 Cluster names are cell type name.
 
-#### 3.5 Compare DE between subcluster within all major cell types
+#### 3.5 Compare differential expression between subcluster within all major cell types
 
 Perictyes subclusters 1 in 129_B6_aged   <——vs——>  all other subclusters in Perictyes except  1 in 129_B6_aged<br />
 Endothelial subclusters 1 in 129_B6_aged  <——vs——>  all other subclusters in Endothelial except 1 in 129_B6_aged<br />
@@ -87,32 +87,29 @@ Myeloid Cells  subclusters 1 in 129_B6_aged   <——vs——>  all other subclu
 RPE cells subclusters 1 in 129_B6_aged   <——vs——>  all other subclusters in RPE Cells except  1 in 129_B6_aged<br />
 etc...<br />
 
-Respectively,data is stored in :<br />
+Respectively, data is stored in :<br />
 `./output/Pericytes.aged.csv` and `./output/Pericytes.young.csv`. <br />
 `./output/Endothelial.Cells.aged.csv` and `./output/Endothelial.Cells.young.csv`.<br />
 `./output/Myeloid.cells.aged.csv` and `./output/Myeloid.cells.young.csv`<br />
 `./output/RPE.cells.aged.csv` and `./output/RPE.cells.young.csv`<br />
 etc...<br />
-Cluster are original ident name in `./data/mouse_eyes_alignment.Rda`, from 0 to 16. <br />
+Cluster are original identity in `./data/mouse_eyes_alignment.Rda`, from 0 to 16. <br />
 
 Only RPE(Retinal Pigment Epithelium) are further subjected to a second round of unsupervised analysis following the same approach, resulting in 3 subcluster a tSNE analysis with ~0.05 resolution. 
 
-#### 3.6 Compare DE in all major cell types across conditions
+#### 3.6 Compare differential expression in all major cell types across conditions
 
 Perictyes in 129_B6   <——vs——>  Perictyes in 129_B6_aged<br />
 Endothelial in 129_B6 <——vs——>  Endothelial in 129_B6_aged<br />
 Myeloid Cells in 129_B6   <——vs——>  Myeloid Cells in 129_B6_aged<br />
 etc...
 
-#### 3.7 Compare DE in all major cell types across conditions
+#### 3.7 Compare differential expression in all major cell types across conditions
 
 Perictyes subcluster 1 in 129_B6   <——vs——>  Perictyes subcluster 1 in 129_B6_aged<br />
 Perictyes subcluster 2 in 129_B6   <——vs——>  Perictyes subcluster 2 in 129_B6_aged<br />
-etc...
+etc...<br />
 Endothelial subcluster 1 in 129_B6 <——vs——>  Endothelial subcluster 1 in 129_B6_aged<br />
 Endothelial subcluster 2 in 129_B6 <——vs——>  Endothelial subcluster 2 in 129_B6_aged<br />
-etc...
+etc...<br />
 and the same for all subclusters in Myeloid cells and RPE cells.
-
-
-The modified Seurat function FindAllMarkers was used to calculate average differential expression among cell clusters. The p-value was calculated using likelihood-ratio test and adjusted by Benjamini-Hochberg method.

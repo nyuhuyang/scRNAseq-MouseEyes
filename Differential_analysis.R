@@ -111,7 +111,7 @@ p2 <- LabelUL(p2, genes = genes.to.label4, avg.RPE, adj.u.t = 0.5, adj.u.s = 0.4
               adj.l.t = 0.25, adj.l.s = 0.25,text.size = 4)
 plot_grid(p1, p2)
 
-#3.4  CVS files with the differential expression between 129_B6 and 129_B6_aged.
+#3.4  Compare DE across all major cell types
 #We would need the data for all clusters, as well the subclusters (RPE and hematopoietic cells).
 load("./data/mouse_eyes_alignment.Rda")
 table(mouse_eyes@ident)
@@ -146,7 +146,7 @@ TSNEPlot(object = mouse_eyes, no.legend = FALSE, do.label = TRUE,
 #in the different cell types and subtypes. 
 #It will also be interesting to check if there is some subtype enriched in 129_B6 compared to 129_B6_aged or viceversa. 
 
-FindBothMarkers <- function(object = mouse_eyes){
+FindAllMarkers.Write <- function(object = mouse_eyes){
   all.cell <- FetchData(object,"conditions")
   cell.young <- rownames(all.cell)[all.cell$conditions =="young"]
   cell.aged <- rownames(all.cell)[all.cell$conditions =="aged"]
@@ -178,9 +178,9 @@ FindBothMarkers <- function(object = mouse_eyes){
                      ".csv"))
   return(object.markers)
 }
-mouse_eyes.129_B6.markers <- FindBothMarkers(object = mouse_eyes)
+mouse_eyes.129_B6.markers <- FindAllMarkers.Write(object = mouse_eyes)
 
-#3.5  CVS files with the differential expression between 129_B6 and 129_B6_aged.
+#3.5 Compare DE between subcluster within all major cell types
 #http://satijalab.org/seurat/de_vignette.html#perform-de-analysis-using-alternative-tests
 # Compare subclusters within aged and young
 lnames = load(file = "./data/mouse_eyes_alignment.Rda")
@@ -190,19 +190,19 @@ lnames
 Myeloid.cells <- SubsetData(object = mouse_eyes,
                             ident.use = old.ident.ids[(new.cluster.ids %in% "Myeloid Cells")])
 table(Myeloid.cells@ident)
-Myeloid.cells.markers <- FindBothMarkers(Myeloid.cells)
+Myeloid.cells.markers <- FindAllMarkers.Write(Myeloid.cells)
 
 # Perictyes==========
 Pericytes <- SubsetData(object = mouse_eyes,
                         ident.use = old.ident.ids[(new.cluster.ids %in% "Pericytes")])
 table(Pericytes@ident)
-Pericytes.markers <- FindBothMarkers(Pericytes)
+Pericytes.markers <- FindAllMarkers.Write(Pericytes)
 
 # Endothelial Cells==========
 Endothelial.Cells <- SubsetData(object = mouse_eyes,
                                 ident.use = old.ident.ids[(new.cluster.ids %in% "Endothelial Cells")])
 table(Endothelial.Cells@ident)
-Endothelial.Cells.markers <- FindBothMarkers(Endothelial.Cells)
+Endothelial.Cells.markers <- FindAllMarkers.Write(Endothelial.Cells)
 
 # RPE cells=========
 RPE.cells <- SubsetData(object = mouse_eyes,
@@ -214,6 +214,17 @@ RPE.cells <- FindClusters(object = RPE.cells,
                           save.SNN = TRUE)
 TSNEPlot(object = RPE.cells, no.legend = TRUE, do.label = TRUE,
          label.size = 7)
-RPE.cells.markers <- FindBothMarkers(RPE.cells)
+RPE.cells.markers <- FindAllMarkers.Write(RPE.cells)
 
-# Compare subcluster between aged vs young
+#3.6 Compare subcluster between aged vs young===============
+lnames = load(file = "./data/mouse_eyes_alignment.Rda")
+lnames
+# keep the original ident name intact
+# Myeloid Cells===============
+Myeloid.cells <- SubsetData(object = mouse_eyes,
+                            ident.use = old.ident.ids[(new.cluster.ids %in% "Myeloid Cells")])
+table(Myeloid.cells@ident)
+table(Myeloid.cells@meta.data$orig.ident)
+object = Myeloid.cells
+FindAllMarkers()
+FindMarkers()
