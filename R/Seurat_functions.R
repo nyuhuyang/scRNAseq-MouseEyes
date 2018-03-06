@@ -74,6 +74,7 @@ FilterCellsBy <- function(object,name){
 
 # find and print differentially expressed genes within all major cell types ================
 # combine SubsetData, FindAllMarkers, write.csv parallely
+
 FindAllMarkers.Write <- function(object = mouse_eyes){
   all.cell <- FetchData(object,"conditions")
   cell.young <- rownames(all.cell)[all.cell$conditions =="young"]

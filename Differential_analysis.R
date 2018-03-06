@@ -145,39 +145,6 @@ TSNEPlot(object = mouse_eyes, no.legend = FALSE, do.label = TRUE,
 #detect changes in gene expression between 129_B6 and 129_B6_aged, 
 #in the different cell types and subtypes. 
 #It will also be interesting to check if there is some subtype enriched in 129_B6 compared to 129_B6_aged or viceversa. 
-
-FindAllMarkers.Write <- function(object = mouse_eyes){
-  all.cell <- FetchData(object,"conditions")
-  cell.young <- rownames(all.cell)[all.cell$conditions =="young"]
-  cell.aged <- rownames(all.cell)[all.cell$conditions =="aged"]
-  
-  object.young <- SubsetData(object = object,
-                             cells.use =cell.young)
-  object.aged <- SubsetData(object = object,
-                            cells.use =cell.aged)
-  object.young.markers <- FindAllMarkers(object = object.young,
-                                         thresh.use = -Inf,
-                                         test.use = "bimod",
-                                         min.pct = -Inf,
-                                         min.diff.pct = -Inf,
-                                         min.cells = -Inf)
-  object.aged.markers <- FindAllMarkers(object = object.aged, 
-                                        thresh.use = -Inf,
-                                        test.use = "bimod",
-                                        min.pct = -Inf,
-                                        min.diff.pct = -Inf,
-                                        min.cells = -Inf)
-  object.markers <- list(young = object.young.markers,
-                         aged = object.aged.markers)
-  mapply(write.csv,
-         x= object.markers,
-         #convert variable (object) name into String
-         file=paste0("./output/",
-                     deparse(substitute(object)), 
-                     ".",names(object.markers),
-                     ".csv"))
-  return(object.markers)
-}
 mouse_eyes.129_B6.markers <- FindAllMarkers.Write(object = mouse_eyes)
 
 #3.5 Compare DE between subcluster within all major cell types
