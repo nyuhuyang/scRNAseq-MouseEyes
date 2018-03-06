@@ -1,11 +1,11 @@
 # scRNAseq-MouseEyes
 
------ | ----------------------------------------
-Title | Single cell transcriptomics of adult and young mouse RPE/choroid 
-Author | Yang Hu
-Department | Physiology and Biophysics
-University | Weill Cornell Medicine
-Email | yah2014@med.cornell.edu
+ | ----- | ----------------------------------------
+ | Title | Single cell transcriptomics of adult and young mouse RPE/choroid 
+ | Author | Yang Hu
+ | Department | Physiology and Biophysics
+ | University | Weill Cornell Medicine
+ | Email | yah2014@med.cornell.edu
 
 
 ## Research Background
