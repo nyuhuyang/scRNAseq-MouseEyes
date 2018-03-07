@@ -141,12 +141,12 @@ Below is a example of `./output/Myeloid.cells_young_vs_aged.csv` file with first
 
 | row.name | p_val | avg_logFC | pct.1 | pct.2 | p_val_adj |  avg_UMI | cluster | gene |
 | ----- | ------ | -------- | ----  | ----- | --------- | ------- | ------| --- |
-| Gm10116 | 1.284487e-15 | 0.4632350 | 1.000 | 0.682 | 2.130964e-11 | 2.367182 | 9_young_vs_aged | Gm10116
-|  Tpt1 | 1.621354e-15 | 0.6115835 | 1.000 | 0.991 | 2.689827e-11 | 3.488468 | 9_young_vs_aged  |  Tpt1
-|  Rplp1 | 2.693436e-14 | 0.7171527 | 1.000 | 1.000 | 4.468410e-10 | 3.517573 | 9_young_vs_aged  | Rplp1
-|  Rps12 | 9.850126e-14 | 0.7310988 | 1.000 | 0.982 | 1.634136e-09 | 2.791656 | 9_young_vs_aged  | Rps12
-|   Pfn1 | 4.524193e-13 | -0.8179159 | 0.944 | 0.973 | 7.505636e-09 | 2.305897 | 9_young_vs_aged  | Pfn1
-|   Ttr | 3.459388e-12 | -1.3104775 | 0.870 | 1.000 | 5.739125e-08 | 2.485390 | 9_young_vs_aged  | Ttr
+| Gm10116 | 1.28e-15 | 0.4632 | 1.000 | 0.682 | 2.130e-11 | 2.367 | 9_young_vs_aged | Gm10116
+|  Tpt1 | 1.62e-15 | 0.6115 | 1.000 | 0.991 | 2.689e-11 | 3.488 | 9_young_vs_aged  |  Tpt1
+|  Rplp1 | 2.69e-14 | 0.7171 | 1.000 | 1.000 | 4.468e-10 | 3.517 | 9_young_vs_aged  | Rplp1
+|  Rps12 | 9.85e-14 | 0.7310 | 1.000 | 0.982 | 1.634e-09 | 2.791 | 9_young_vs_aged  | Rps12
+|   Pfn1 | 4.52e-13 | -0.8179 | 0.944 | 0.973 | 7.505e-09 | 2.305 | 9_young_vs_aged  | Pfn1
+|   Ttr | 3.45e-12 | -1.3104 | 0.870 | 1.000 | 5.739e-08 | 2.485 | 9_young_vs_aged  | Ttr
 
 Cluster indicates the original cluster 9 in `./data/mouse_eyes_alignment.Rda`, young vs aged.<br />
 Only RPE(Retinal Pigment Epithelium) are further subjected to a second round of unsupervised analysis following the same approach, resulting in 3 subcluster a tSNE analysis with ~0.05 resolution. 
