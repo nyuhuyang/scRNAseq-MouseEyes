@@ -5,7 +5,7 @@ The choroid is a highly vascularized layer of the eye localized between the scle
 
 AMD affects 25% people over 80 years old, being a leading cause of blindness in developed countries and approaching epidemic proportions in the United States. However, currently, there is the only treatment for 10% of patients who suffer the advanced, angiogenic form of the disease, and not all respond successfully. The lack of therapeutic options is mainly due to the fact that AMD etiology remains unknown, and probably involves the malfunction of several cell types and multiple intercellular signaling pathways. Thus, it is imperative to carry out systematic studies to characterize in detail all RPE/choroid cell types at the molecular level and to understand how cells communicate among them to maintain choroid and retinal homeostasis. This would constitute the first step to assess whether choroidal intercellular cellular crosstalk is compromised in AMD and to develop new therapeutic strategies based on the restoration of such signaling circuits.
 
-Here, we used young and aged mice to carry out for the first time single cell RNAseq of RPE/choroid tissue, providing its molecular characterization at single cell resolution. In combination with tissue-specific endothelial cell transcription profiling and the use of transgenic mouse models, we discovered a novel immunomodulatory signaling circuit in the choroid.
+Here, we used young and aged mice to carry out for the first time single cell RNAseq of RPE/choroid tissue, providing its molecular characterization at single cell resolution. In combination with tissue-specific endothelial cell transcription profiling and the use of transgenic mouse models, we discovered some novel mechanisms.
 
 ## Data
 Chromium single-cell RNA-seq outputs were processed by Cell Ranger analysis pipelines. Data is currently unavailable to the public before publication.
@@ -48,18 +48,18 @@ Multiple plots and table will be generated, save them if you want. I prefer to k
 `FindAllMarkersInSameAge()` can split seurat data by conditions(aged vs. young), find All gene Markers differentially expressed between cluster in the same age,calculate average UMI, and generate csv files in **_output_** folder.
 
 `FindAllMarkersbyAge()` can rename cell identity by conditions(aged vs. young), find All gene Markers
-differentially expressed between aged and yound strains,calculate average UMI, and generate csv files in **_output_** folder.
+differentially expressed between aged and young strains, calculate average UMI, and generate CSV files in **_output_** folder.
 
 Below is a example of `./output/mouse_eyes.aged.csv` file with first 6 rows.
 
-| row.name | p_val | avg_logFC | pct.1 | pct.2 | p_val_adj | cluster  | gene   | 
-| ----- | ------ | -------- | ----  | ----- | --------- | ------- | ------|
-|  Plvap   |  0 | 3.251091 | 0.950 | 0.239     |     0 | Endothelial Cells  | Plvap
-|  Cldn5   |  0 | 2.898564 | 0.858 | 0.071     |     0 | Endothelial Cells  | Cldn5
-|  Plpp1   | 0 | 2.794314 | 0.902 | 0.153     |     0 | Endothelial Cells  | Plpp1
-|  Egfl7   |  0 | 2.754571 | 0.984 | 0.092    |      0 | Endothelial Cells  | Egfl7
-| Igfbp3   |  0 | 2.559527 | 0.725 | 0.053     |     0 | Endothelial Cells | Igfbp3
-|    Eng   |  0 | 2.489143 | 0.956 | 0.153     |    0 | Endothelial Cells   | Eng
+| row.name | p_val | avg_logFC | pct.1 | pct.2 | p_val_adj |  avg_UMI | cluster | gene |
+| ----- | ------ | -------- | ----  | ----- | ------- | ------- | ------| --- |
+|  Plvap  |   0  | 3.2510 | 0.950 | 0.239  |    0 | 3.3911 | Endothelial Cells | Plvap
+|  Cldn5  |   0  | 2.8985 | 0.858 | 0.071   |    0 | 2.5149 | Endothelial Cells | Cldn5
+|  Plpp1  |   0  | 2.7943 | 0.902 | 0.153   |    0 | 2.6818 | Endothelial Cells | Plpp1
+|  Egfl7  |   0  | 2.7545 | 0.984 | 0.092   |    0 | 2.8285 | Endothelial Cells | Egfl7
+| Igfbp3  |   0  | 2.5595 | 0.725 | 0.053   |    0 | 1.8029 | Endothelial Cells | Igfbp3
+|    Eng  |   0  | 2.4891 | 0.956 | 0.153   |    0 | 2.6239 | Endothelial Cells  | Eng
 
 The results data frame has the following columns :
 
@@ -108,7 +108,7 @@ Below is a example of `./output/Myeloid.cells.aged.csv` file with first 6 rows.
 | Rplp0  | 4.885699e-36  |  1.100676  | 1.000  | 0.952  | 8.105375e-32  | 3.6815406 | 9 | Rplp0
 
 Cluster indicates the original cluster 9 in `./data/mouse_eyes_alignment.Rda`.
-Only RPE(Retinal Pigment Epithelium) are further subjected to a second round of unsupervised analysis following the same approach, resulting in 3 subcluster a tSNE analysis with ~0.05 resolution. 
+Only RPE(Retinal Pigment Epithelium) is further subjected to a second round of unsupervised analysis following the same approach, resulting in 3 subclusters a tSNE analysis with ~0.05 resolution. 
 
 
 #### 3.6 Compare differential expression in all major cell types across conditions
@@ -150,4 +150,4 @@ Below is a example of `./output/Myeloid.cells_young_vs_aged.csv` file with first
 
 
 Cluster indicates the original cluster 9 in `./data/mouse_eyes_alignment.Rda`, young vs aged.<br />
-Only RPE(Retinal Pigment Epithelium) are further subjected to a second round of unsupervised analysis following the same approach, resulting in 3 subcluster a tSNE analysis with ~0.05 resolution. 
+Only RPE(Retinal Pigment Epithelium) is further subjected to a second round of unsupervised analysis following the same approach, resulting in 3 subclusters a tSNE analysis with ~0.05 resolution.
