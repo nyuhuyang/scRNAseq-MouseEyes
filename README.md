@@ -45,9 +45,9 @@ Multiple plots and table will be generated, save them if you want. I prefer to k
 `TSNEPlot()`, `SplitDotPlotGG()`,`ggplot()+LabelUR()+LabelLR()` are implemented for visualising differential expressed genes across conditions.
 
 #### 3.4~3.7 Generate csv files with differential expression comparision
-`FindAllMarkersInSameAge()` can split seurat data by conditions(aged vs. young), find All gene Markers differentially expressed between cluster in the same age,calculate average UMI, and generate csv files in **_output_** folder.
+`FindAllMarkersInSameAge()` can split seurat data by age (aged vs. young), find All gene Markers differentially expressed among clusters with in the same age, calculate average UMI, and generate csv files in **_output_** folder.
 
-`FindAllMarkersbyAge()` can rename cell identity by conditions(aged vs. young), find All gene Markers
+`FindAllMarkersbyAge()` can rename cell identity by age (aged vs. young), find All gene Markers
 differentially expressed between aged and young strains, calculate average UMI, and generate CSV files in **_output_** folder.
 
 Below is a example of `./output/mouse_eyes.aged.csv` file with first 6 rows.
@@ -111,7 +111,7 @@ Cluster indicates the original cluster 9 in `./data/mouse_eyes_alignment.Rda`.
 Only RPE(Retinal Pigment Epithelium) is further subjected to a second round of unsupervised analysis following the same approach, resulting in 3 subclusters a tSNE analysis with ~0.05 resolution. 
 
 
-#### 3.6 Compare differential expression in all major cell types across conditions
+#### 3.6 Compare differential expression in all major cell types between young and aged mouse
 
 Perictyes in 129_B6   <——vs——>  Perictyes in 129_B6_aged<br />
 Endothelial in 129_B6 <——vs——>  Endothelial in 129_B6_aged<br />
@@ -120,7 +120,7 @@ etc...
 Data is stored in `./output/mouse_eyes_young_vs_aged.csv`.<br />
 
 
-#### 3.7 Compare differential expression in all major cell types across conditions
+#### 3.7 Compare differential expression in all major cell types between young and aged mouse
 
 Perictyes subcluster 1 in 129_B6   <——vs——>  Perictyes subcluster 1 in 129_B6_aged<br />
 Perictyes subcluster 2 in 129_B6   <——vs——>  Perictyes subcluster 2 in 129_B6_aged<br />
