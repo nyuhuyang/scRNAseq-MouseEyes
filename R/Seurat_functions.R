@@ -1,151 +1,185 @@
-# make DiffTTestResults into one data.frame and rename columns
-CbindRename <- function(x = x, y= NULL){
-        x0 <- x[[1]]
-        y0 <- y[[1]]
-        name <- c(names(x0),names(y0))
-        Rownames <- rownames(x0)
-        x0 <- cbind(x0,y0[match(rownames(x0),rownames(y0)),])
-        for(i in 2:length(x)){
-                x0 <- cbind(x0,x[[i]][match(rownames(x0),
-                                            rownames(x[[i]])),])
-                x0 <- cbind(x0,y[[i]][match(rownames(x0),
-                                            rownames(y[[i]])),])
+# combine FindAllMarkers and calculate average UMI
+
+FindAllMarkers.UMI <- function (object, genes.use = NULL, logfc.threshold = 0.25, 
+          test.use = "wilcox", min.pct = 0.1, min.diff.pct = -Inf, 
+          print.bar = TRUE, only.pos = FALSE, max.cells.per.ident = Inf, 
+          return.thresh = 0.01, do.print = FALSE, random.seed = 1, 
+          min.cells = 3, latent.vars = "nUMI", assay.type = "RNA", 
+          ...) 
+{
+    data.1 <- GetAssayData(object = object, assay.type = assay.type, 
+                           slot = "data")
+    genes.use <- Seurat:::SetIfNull(x = genes.use, default = rownames(x = data.1))
+    if ((test.use == "roc") && (return.thresh == 0.01)) {
+        return.thresh = 0.7
+    }
+    idents.all <- sort(x = unique(x = object@ident))
+    genes.de <- list()
+    avg_UMI <- list()
+    for (i in 1:length(x = idents.all)) {
+        genes.de[[i]] <- tryCatch({
+            FindMarkers(object = object, assay.type = assay.type, 
+                        ident.1 = idents.all[i], ident.2 = NULL, genes.use = genes.use, 
+                        logfc.threshold = logfc.threshold, test.use = test.use, 
+                        min.pct = min.pct, min.diff.pct = min.diff.pct, 
+                        print.bar = print.bar, min.cells = min.cells, 
+                        latent.vars = latent.vars, max.cells.per.ident = max.cells.per.ident, 
+                        ...)
+        }, error = function(cond) {
+            return(NULL)
+        })
+        avg_UMI[[i]] <-rowMeans(as.matrix(x = object@data[, WhichCells(object = object,
+                                                                       ident = idents.all[[i]])]))
+        avg_UMI[[i]] <-data.frame(avg_UMI = avg_UMI[[i]])
+        genes.de[[i]] <- cbind(genes.de[[i]],
+                               avg_UMI[[i]][,"avg_UMI"][match(rownames(genes.de[[i]]), 
+                                                              rownames(avg_UMI[[i]]))])
+        colnames(genes.de[[i]])[6] <- "avg_UMI"
+        if (do.print) {
+            print(paste("Calculating cluster", idents.all[i]))
         }
-        
-        name <- paste0(rep(paste0(name,".C"),length(x)), 
-                       rep(0:(length(x)-1),each = length(name)))
-        colnames(x0) <- name
-        rownames(x0) <- Rownames
-        print(head(x0[1:6]))
-        return(x0)
+    }
+    gde.all <- data.frame()
+    for (i in 1:length(x = idents.all)) {
+        if (is.null(x = unlist(x = genes.de[i]))) {
+            next
+        }
+        gde <- genes.de[[i]]
+        if (nrow(x = gde) > 0) {
+            if (test.use == "roc") {
+                gde <- subset(x = gde, subset = (myAUC > return.thresh | 
+                                                     myAUC < (1 - return.thresh)))
+            }
+            else {
+                gde <- gde[order(gde$p_val, -gde$avg_logFC), 
+                           ]
+                gde <- subset(x = gde, subset = p_val < return.thresh)
+            }
+            if (nrow(x = gde) > 0) {
+                gde$cluster <- idents.all[i]
+                gde$gene <- rownames(x = gde)
+            }
+            if (nrow(x = gde) > 0) {
+                gde.all <- rbind(gde.all, gde)
+            }
+        }
+    }
+    if (only.pos) {
+        return(subset(x = gde.all, subset = avg_logFC > 0))
+    }
+    rownames(x = gde.all) <- make.unique(names = as.character(x = gde.all$gene))
+    return(gde.all)
 }
 
-
-# Differential Expression Testing with average nUMI,among different Ident====
-DiffTTestbyIdent <- function(object){
-        "Updated with Seurat v2.2"
-        
-        cluster.markers <- NULL
-        avg_UMI <- NULL
-        DiffTTestResults <- NULL
-        
-        for(i in 1:nlevels(object@ident)){
-                # find markers for every cluster compared to all remaining cells
-                cluster.markers[[i]] <- FindMarkers(object = object,
-                                                    ident.1 = i-1, #careful with cluster 0
-                                                    test.use = "bimod",
-                                                    logfc.threshold = -Inf,
-                                                    min.pct = -Inf,
-                                                    min.cells = -Inf) 
-                # resluts = "p_val",  "avg_logFC", "pct.1", "pct.2" ,"p_val_adj"
-                
-                cluster.markers[[i]] <- cluster.markers[[i]][,c("p_val_adj","avg_logFC")]
-                names(cluster.markers[[i]])[2] <- "avg_diff"
-                # resluts = "p_val_adj",  "avg_diff"
-                
-                avg_UMI[[i]] <-rowMeans(as.matrix(x = object@data[, WhichCells(object = object,
-                                                                               ident = i-1)]))
-                avg_UMI[[i]] <-data.frame(avg_UMI = avg_UMI[[i]])
-                DiffTTestResults[[i]] <- cbind(cluster.markers[[i]],
-                                               avg_UMI[[i]][,"avg_UMI"][match(rownames(cluster.markers[[i]]), 
-                                                                              rownames(avg_UMI[[i]]))])
-                colnames(DiffTTestResults[[i]])[3] <- "avg_UMI"
-                # resluts = "adj.p_val",  "avg_diff", "avg_UMI"
-        }
-        for(i in 1:nlevels(object@ident)){
-                print(dim(DiffTTestResults[[i]]))
-        }
-        return(DiffTTestResults)
-}
-
-# subset by protocol ================
-# there are some weakness for SubsetData function in Seurat package
-# for example it can't subset data by protocol name
-# once merge two seurat object, it's hard to separte them again
-# So I write this function to filter cell by protocol, or label in cell name
-FilterCellsBy <- function(object,name){
-        cells.name <- grepl(name,unlist(object@data@Dimnames))
-        cells.name <- unlist(object@data@Dimnames)[cells.name]
-        object.name <-SubsetData(object = object,
-                                 cells.use =cells.name)
-        print(table(object.name@meta.data$protocol)) #test
-        return(object.name)
-}
 
 # find and print differentially expressed genes within all major cell types ================
 # combine SubsetData, FindAllMarkers, write.csv parallely
 
-FindAllMarkers.Write <- function(object = mouse_eyes){
-  all.cell <- FetchData(object,"conditions")
-  cell.young <- rownames(all.cell)[all.cell$conditions =="young"]
-  cell.aged <- rownames(all.cell)[all.cell$conditions =="aged"]
-  
-  object.young <- SubsetData(object = object,
-                             cells.use =cell.young)
-  object.aged <- SubsetData(object = object,
-                            cells.use =cell.aged)
-  object.young.markers <- FindAllMarkers(object = object.young,
-                                         thresh.use = -Inf,
-                                         test.use = "bimod",
-                                         min.pct = -Inf,
-                                         min.diff.pct = -Inf,
-                                         min.cells = -Inf)
-  object.aged.markers <- FindAllMarkers(object = object.aged, 
-                                        thresh.use = -Inf,
-                                        test.use = "bimod",
-                                        min.pct = -Inf,
-                                        min.diff.pct = -Inf,
-                                        min.cells = -Inf)
-  object.markers <- list(young = object.young.markers,
-                         aged = object.aged.markers)
-  mapply(write.csv,
-         x= object.markers,
-         #convert variable (object) name into String
-         file=paste0("./output/",
-                     deparse(substitute(object)), 
-                     ".",names(object.markers),
-                     ".csv"))
-  return(object.markers)
+FindAllMarkersInSameAge <- function(object,write.csv = TRUE){
+        all.cell <- FetchData(object,"conditions")
+        cell.young <- rownames(all.cell)[all.cell$conditions =="young"]
+        cell.aged <- rownames(all.cell)[all.cell$conditions =="aged"]
+        
+        object.young <- SubsetData(object = object,
+                                 cells.use =cell.young)
+        object.aged <- SubsetData(object = object,
+                                cells.use =cell.aged)
+        object.young.markers <- FindAllMarkers.UMI(object = object.young,
+                                             logfc.threshold = -Inf,
+                                             test.use = "bimod",
+                                             min.pct = -Inf,
+                                             min.diff.pct = -Inf,
+                                             min.cells = -Inf)
+        object.aged.markers <- FindAllMarkers.UMI(object = object.aged, 
+                                            logfc.threshold = -Inf,
+                                            test.use = "bimod",
+                                            min.pct = -Inf,
+                                            min.diff.pct = -Inf,
+                                            min.cells = -Inf)
+        object.markers <- list(young = object.young.markers,
+                             aged = object.aged.markers)
+        if(write.csv){
+          mapply(write.csv,
+                 x= object.markers,
+                 #convert variable (object) name into String
+                 file=paste0("./output/",
+                             deparse(substitute(object)), 
+                             ".",names(object.markers),
+                             ".csv"))}
+        return(object.markers)
 }
 
 
 # find and print differentially expressed genes across conditions ================
-# combine FindMarkers and write.csv
-FindMarkers.Write <- function(object = mouse_eyes){
-  all.cell <- FetchData(object,"conditions")
-  cell.young <- rownames(all.cell)[all.cell$conditions =="young"]
-  cell.aged <- rownames(all.cell)[all.cell$conditions =="aged"]
-  
-  object.young <- SubsetData(object = object,
-                             cells.use =cell.young)
-  object.aged <- SubsetData(object = object,
-                            cells.use =cell.aged)
-  object.young.markers <- FindAllMarkers(object = object.young,
-                                         thresh.use = -Inf,
-                                         test.use = "bimod",
-                                         min.pct = -Inf,
-                                         min.diff.pct = -Inf,
-                                         min.cells = -Inf)
-  object.aged.markers <- FindAllMarkers(object = object.aged, 
-                                        thresh.use = -Inf,
-                                        test.use = "bimod",
-                                        min.pct = -Inf,
-                                        min.diff.pct = -Inf,
-                                        min.cells = -Inf)
-  object.markers <- list(young = object.young.markers,
-                         aged = object.aged.markers)
-  mapply(write.csv,
-         x= object.markers,
-         #convert variable (object) name into String
-         file=paste0("./output/",
-                     deparse(substitute(object)), 
-                     ".",names(object.markers),
-                     ".csv"))
-  return(object.markers)
+# combine SetIdent,indMarkers and avg_UMI
+FindAllMarkersbyAge<- function(object, genes.use = NULL, logfc.threshold = -Inf, 
+                              test.use = "bimod", min.pct = -Inf, min.diff.pct = -Inf, 
+                              print.bar = TRUE, only.pos = FALSE, max.cells.per.ident = Inf, 
+                              return.thresh = 0.01, do.print = FALSE, random.seed = 1, 
+                              min.cells = -Inf, latent.vars = "nUMI", assay.type = "RNA", 
+                              ...) 
+{   
+        cells <- FetchData(object,"conditions")
+        cells$ident <- object@ident
+        cells$new.ident <- paste0(cells$ident,"_",cells$conditions)
+        object <- SetIdent(object, cells.use = rownames(cells),
+                           ident.use = cells$new.ident)
+        idents.all <- sort(x = unique(x = cells$ident))
+        genes.de <- list()
+        avg_UMI <- list()
+        for (i in 1:length(x = idents.all)) {
+            genes.de[[i]] <- tryCatch({
+                FindMarkers(object = object, 
+                            ident.1 = paste0(idents.all[i],"_","young"),
+                            ident.2 = paste0(idents.all[i],"_","aged"), 
+                            logfc.threshold = logfc.threshold, test.use = test.use, 
+                            min.pct = min.pct, min.diff.pct = min.diff.pct, 
+                            min.cells = min.cells,...)
+            }, error = function(cond) {
+                return(NULL)
+            })
+            avg_UMI[[i]] <-rowMeans(as.matrix(x = object@data[, rownames(cells)[cells$ident == idents.all[i]]]))
+            avg_UMI[[i]] <-data.frame(avg_UMI = avg_UMI[[i]])
+            genes.de[[i]] <- cbind(genes.de[[i]],
+                                           avg_UMI[[i]][,"avg_UMI"][match(rownames(genes.de[[i]]), 
+                                                                          rownames(avg_UMI[[i]]))])
+            colnames(genes.de[[i]])[6] <- "avg_UMI"
+        }
+        gde.all <- data.frame()
+        for (i in 1:length(x = idents.all)) {
+            if (is.null(x = unlist(x = genes.de[i]))) {
+                next
+            }
+            gde <- genes.de[[i]]
+            if (nrow(x = gde) > 0) {
+                if (test.use == "roc") {
+                    gde <- subset(x = gde, subset = (myAUC > return.thresh | 
+                                                         myAUC < (1 - return.thresh)))
+                }
+                else {
+                    gde <- gde[order(gde$p_val, -gde$avg_logFC), 
+                               ]
+                    gde <- subset(x = gde, subset = p_val < return.thresh)
+                }
+                if (nrow(x = gde) > 0) {
+                    gde$cluster <- paste0(idents.all[i],"_","young_vs_aged")
+                    gde$gene <- rownames(x = gde)
+                }
+                if (nrow(x = gde) > 0) {
+                    gde.all <- rbind(gde.all, gde)
+                }
+            }
+        }
+        rownames(x = gde.all) <- make.unique(names = as.character(x = gde.all$gene))
+    #    object.name <- 
+    #    write.csv(x= gde.all,
+        #convert variable (object) name into String
+    #              file=paste0("./output/",deparse(substitute(object)),"_young_vs_aged.csv"))
+        return(gde.all)
 }
 
 
-LogNormalize
+
 # modified GenePlot
 # GenePlot.1(do.hover = TRUE) will return ggplot 
 GenePlot.1 <- function (object, gene1, gene2, cell.ids = NULL, col.use = NULL, 
@@ -229,32 +263,6 @@ LabelUL <- function(plot, genes, exp.mat, adj.u.t = 0.1, adj.l.t = 0.15, adj.u.s
                           adj.y.s = adj.u.s, adj.x.s = -adj.l.s, ...))
 }
 
-# Calculate Log2fold change
-Log2fold <- function(object){
-        #Limma's "Log(FC)" = mean(log2(Group1)) - mean(log2(Group2))
-        # = Sum(log2(Group1))/n1 - Sum(log(all other groups))/(N-n1)     
-        sum_UMI <- data.frame(matrix(0,nrow = object@data@Dim[1], # number of genes
-                                     ncol = nlevels(object@ident))) # number of idents
-        nCells <- data.frame(matrix(0,nrow = 1,ncol = nlevels(object@ident)))
-        
-        for(i in 1:nlevels(object@ident)){
-                exprs <- as.matrix(x = object@data[, WhichCells(object = object,
-                                                                ident = i-1)])
-                sum_UMI[,i] <- rowSums(log2(exprs+1))
-                nCells[1,i] <- ncol(exprs)
-                print(head(as.data.frame(sum_UMI[,i]),3));print(nCells[1,i])
-        }
-        total.cells <- object@data@Dim[2]
-        #       Log2FC = Sum(log2(Group1))/n1 - Sum(log(all other groups))/(N-n1) 
-        Log2FC <- NULL
-        for(i in 1:nlevels(object@ident)){
-                Log2FC[[i]] = data.frame(Log2FC= sum_UMI[,i]/nCells[1,i]- 
-                                                 rowSums(sum_UMI[,-i])/(total.cells-nCells[1,i]))
-                rownames(Log2FC[[i]]) <-rownames(exprs)
-        }
-        print(lapply(Log2FC,head,3))
-        return(Log2FC)
-}
 
 # MouseGenes
 # turn list of gene character to uniform mouse gene list format
@@ -286,58 +294,6 @@ RenameIdentBack <- function(object){
                                         to = new.cluster.ids)
         return(object)
 }
-
-# rename ident by one gene expression
-# This give ident a extra label,
-# which is decided by one specific gene's expression
-# this function is used to run DE analysis between cells with and without one gene
-# use this function along with FilterCellsBy
-RenameIdentbyGene <- function(object,label.genes =NULL,accept.low = 1){
-        
-        if(is.null(label.genes)){print("At least one label gene and one gene only")}
-        
-        label.genes <- capitalize(tolower(label.genes))
-        label.genes <- label.genes[label.genes %in% object@raw.data@Dimnames[[1]]]
-        
-        #split seurat object by Gene expression level
-        object.label.genes <- SubsetData(object = object,
-                                         subset.name = label.genes,
-                                         accept.low = accept.low)
-        
-        object.nolabel.genes <- SubsetData(object = object,
-                                           subset.name = label.genes,
-                                           accept.high = accept.low-0.0001)
-        # rename two objects with ident 0 and 1, respectively
-        old.ident.ids <- levels(object.label.genes@ident)
-        new.cluster.ids <- rep(0,nlevels(object.label.genes@ident))
-        object.label.genes@ident <- plyr::mapvalues(x = object.label.genes@ident,
-                                                    from = old.ident.ids,
-                                                    to = new.cluster.ids)
-        
-        old.ident.ids <- levels(object.nolabel.genes@ident)
-        new.cluster.ids <- rep(1,nlevels(object.nolabel.genes@ident))
-        object.nolabel.genes@ident <- plyr::mapvalues(x = object.nolabel.genes@ident,
-                                                      from = old.ident.ids,
-                                                      to = new.cluster.ids)         
-        # Merge two Seurat objects
-        object1 <- MergeSeurat(object.label.genes, object.nolabel.genes,
-                               names.field = 1,
-                               do.normalize =FALSE,
-                               add.cell.id1= 0,add.cell.id2=1)
-        return(object1)
-}
-
-# for modified GenePlot
-SetIfNull <- function (x, default) 
-{
-        if (is.null(x = x)) {
-                return(default)
-        }
-        else {
-                return(x)
-        }
-}
-
 
 # FeaturePlot doesn't return ggplot
 # SingleFeaturePlot doesn't take seurat object as input

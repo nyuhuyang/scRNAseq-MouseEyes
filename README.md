@@ -45,10 +45,12 @@ Multiple plots and table will be generated, save them if you want. I prefer to k
 `TSNEPlot()`, `SplitDotPlotGG()`,`ggplot()+LabelUR()+LabelLR()` are implemented for visualising differential expressed genes across conditions.
 
 #### 3.4~3.7 Generate csv files with differential expression comparision
-`FindAllMarkers.Write()` can split seurat data by conditions(aged vs. young), find All gene Markers differentially expressed between cluster, and generate csv files in **_output_** folder.
+`FindAllMarkersInSameAge()` can split seurat data by conditions(aged vs. young), find All gene Markers differentially expressed between cluster in the same age,calculate average UMI, and generate csv files in **_output_** folder.
+
+`FindAllMarkersbyAge()` can rename cell identity by conditions(aged vs. young), find All gene Markers
+differentially expressed between aged and yound strains,calculate average UMI, and generate csv files in **_output_** folder.
 
 Below is a example of `./output/mouse_eyes.aged.csv` file with first 6 rows.
-
 
 | row.name | p_val | avg_logFC | pct.1 | pct.2 | p_val_adj | cluster  | gene   | 
 | ----- | ------ | -------- | ----  | ----- | --------- | ------- | ------|
@@ -59,7 +61,6 @@ Below is a example of `./output/mouse_eyes.aged.csv` file with first 6 rows.
 | Igfbp3   |  0 | 2.559527 | 0.725 | 0.053     |     0 | Endothelial Cells | Igfbp3
 |    Eng   |  0 | 2.489143 | 0.956 | 0.153     |    0 | Endothelial Cells   | Eng
 
-
 The results data frame has the following columns :
 
 p_val : p_val (unadjusted) is calculated using likelihood-ratio test for single cell gene expression, (McDavid et al., Bioinformatics, 2013) <br />
@@ -67,7 +68,8 @@ avg_logFC : log fold-chage of the average expression between the two groups. Pos
 pct.1 : The percentage of cells where the gene is detected in the first group.<br />
 pct.2 : The percentage of cells where the gene is detected in the second group.<br />
 p_val_adj : Adjusted p-value, based on bonferroni correction using all genes in the dataset.<br />
-cluster: either cell type name or original identity in `./data/mouse_eyes_alignment.Rda`, will specify in later section.<br />
+avg_UMI : average UMI of the cluster.<br />
+cluster : either cell types or original clusters in `./data/mouse_eyes_alignment.Rda`. Will be specified in later section.<br />
 row.name and gene column are identical.<br />
 
 #### 3.4 Compare differential expression across all major cell types
@@ -92,10 +94,22 @@ Respectively, data is stored in :<br />
 `./output/Endothelial.Cells.aged.csv` and `./output/Endothelial.Cells.young.csv`.<br />
 `./output/Myeloid.cells.aged.csv` and `./output/Myeloid.cells.young.csv`<br />
 `./output/RPE.cells.aged.csv` and `./output/RPE.cells.young.csv`<br />
-etc...<br />
-Cluster are original identity in `./data/mouse_eyes_alignment.Rda`, from 0 to 16. <br />
 
+
+Below is a example of `./output/Myeloid.cells.aged.csv` file with first 6 rows.
+
+| row.name | p_val | avg_logFC | pct.1 | pct.2 | p_val_adj |  avg_UMI | cluster | gene |
+| ----- | ------ | -------- | ----  | ----- | --------- | ------- | ------| --- |
+|  Ctsb  | 2.020953e-46  | -2.108154  | 0.882  | 1.000  | 3.352760e-42  | 1.7019446 | 9 | Ctsb
+|  Apoe  | 1.254068e-41  | -2.906343  | 0.836  | 1.000  | 2.080499e-37  | 2.0895885 | 9 | Apoe
+|  Ctsd  | 1.997701e-37  | -2.856376  | 0.518  | 0.984  | 3.314186e-33  | 0.7269393 | 9 | Ctsd
+|  C1qb  | 2.712081e-36 |  -2.070283  | 0.173  | 0.984  | 4.499343e-32  | 0.5121927 | 9 | C1qb
+| Ms4a7  | 3.403560e-36 | -2.685984  | 0.109  | 0.968  | 5.646506e-32  | 0.1998492 | 9 | Ms4a7
+| Rplp0  | 4.885699e-36  |  1.100676  | 1.000  | 0.952  | 8.105375e-32  | 3.6815406 | 9 | Rplp0
+
+Cluster indicates the original cluster 9 in `./data/mouse_eyes_alignment.Rda`.
 Only RPE(Retinal Pigment Epithelium) are further subjected to a second round of unsupervised analysis following the same approach, resulting in 3 subcluster a tSNE analysis with ~0.05 resolution. 
+
 
 #### 3.6 Compare differential expression in all major cell types across conditions
 
@@ -103,6 +117,8 @@ Perictyes in 129_B6   <——vs——>  Perictyes in 129_B6_aged<br />
 Endothelial in 129_B6 <——vs——>  Endothelial in 129_B6_aged<br />
 Myeloid Cells in 129_B6   <——vs——>  Myeloid Cells in 129_B6_aged<br />
 etc...
+Data is stored in `./output/mouse_eyes_young_vs_aged.csv`.<br />
+
 
 #### 3.7 Compare differential expression in all major cell types across conditions
 
@@ -112,4 +128,25 @@ etc...<br />
 Endothelial subcluster 1 in 129_B6 <——vs——>  Endothelial subcluster 1 in 129_B6_aged<br />
 Endothelial subcluster 2 in 129_B6 <——vs——>  Endothelial subcluster 2 in 129_B6_aged<br />
 etc...<br />
-and the same for all subclusters in Myeloid cells and RPE cells.
+and the same for all subclusters in Myeloid cells and RPE cells.<br />
+
+Respectively, data is stored in :<br />
+`./output/Pericytes_young_vs_aged.csv`, <br />
+`./output/Endothelium_young_vs_aged.csv`,<br />
+`./output/Myeloid.cells_young_vs_aged.csv`, <br />
+`./output/RPE_young_vs_aged.csv`.<br />
+
+
+Below is a example of `./output/Myeloid.cells_young_vs_aged.csv` file with first 6 rows.
+
+| row.name | p_val | avg_logFC | pct.1 | pct.2 | p_val_adj |  avg_UMI | cluster | gene |
+| ----- | ------ | -------- | ----  | ----- | --------- | ------- | ------| --- |
+| Gm10116 | 1.284487e-15 | 0.4632350 | 1.000 | 0.682 | 2.130964e-11 | 2.367182 | 9_young_vs_aged | Gm10116
+|  Tpt1 | 1.621354e-15 | 0.6115835 | 1.000 | 0.991 | 2.689827e-11 | 3.488468 | 9_young_vs_aged  |  Tpt1
+|  Rplp1 | 2.693436e-14 | 0.7171527 | 1.000 | 1.000 | 4.468410e-10 | 3.517573 | 9_young_vs_aged  | Rplp1
+|  Rps12 | 9.850126e-14 | 0.7310988 | 1.000 | 0.982 | 1.634136e-09 | 2.791656 | 9_young_vs_aged  | Rps12
+|   Pfn1 | 4.524193e-13 | -0.8179159 | 0.944 | 0.973 | 7.505636e-09 | 2.305897 | 9_young_vs_aged  | Pfn1
+|   Ttr | 3.459388e-12 | -1.3104775 | 0.870 | 1.000 | 5.739125e-08 | 2.485390 | 9_young_vs_aged  | Ttr
+
+Cluster indicates the original cluster 9 in `./data/mouse_eyes_alignment.Rda`, young vs aged.<br />
+Only RPE(Retinal Pigment Epithelium) are further subjected to a second round of unsupervised analysis following the same approach, resulting in 3 subcluster a tSNE analysis with ~0.05 resolution. 
