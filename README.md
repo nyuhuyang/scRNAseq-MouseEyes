@@ -81,7 +81,7 @@ etc...<br />
 Data is stored in `./output/mouse_eyes.aged.csv` and `./output/mouse_eyes.young.csv`.<br />
 Cluster names are cell type name.
 
-#### 3.5 Compare differential expression between subcluster within all major cell types
+#### 3.5 Compare differential expression between subcluster within all major cell types, plus visualization for major cell types.
 
 Perictyes subclusters 1 in 129_B6_aged   <——vs——>  all other subclusters in Perictyes except  1 in 129_B6_aged<br />
 Endothelial subclusters 1 in 129_B6_aged  <——vs——>  all other subclusters in Endothelial except 1 in 129_B6_aged<br />
@@ -108,7 +108,7 @@ Below is a example of `./output/Myeloid.cells.aged.csv` file with first 6 rows.
 | Rplp0  | 4.885699e-36  |  1.100676  | 1.000  | 0.952  | 8.105375e-32  | 3.6815406 | 9 | Rplp0
 
 Cluster indicates the original cluster 9 in `./data/mouse_eyes_alignment.Rda`.
-Only RPE(Retinal Pigment Epithelium) is further subjected to a second round of unsupervised analysis following the same approach, resulting in 3 subclusters a tSNE analysis with ~0.05 resolution. 
+Only RPE (Retinal Pigment Epithelium) is further subjected to a second round of unsupervised analysis following the same approach, resulting in 3 subclusters a tSNE analysis with ~0.05 resolution. 
 
 
 #### 3.6 Compare differential expression in all major cell types between young and aged mouse
@@ -150,4 +150,4 @@ Below is a example of `./output/Myeloid.cells_young_vs_aged.csv` file with first
 
 
 Cluster indicates the original cluster 9 in `./data/mouse_eyes_alignment.Rda`, young vs aged.<br />
-Only RPE(Retinal Pigment Epithelium) is further subjected to a second round of unsupervised analysis following the same approach, resulting in 3 subclusters a tSNE analysis with ~0.05 resolution.
+Only RPE (Retinal Pigment Epithelium) is further subjected to a second round of unsupervised analysis following the same approach, resulting in 3 subclusters a tSNE analysis with ~0.05 resolution.

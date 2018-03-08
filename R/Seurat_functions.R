@@ -284,11 +284,13 @@ MouseGenes <- function(seurat.object,marker.genes){
 }
 
 # rename ident back to 0,1,2,3...
+# convert character ident to numeric
 # RenameIdent function will generate error if new.cluster.ids overlap with old.ident.ids
 # so if want to rename ident smoothly, plyr::mapvalues is still better
 RenameIdentBack <- function(object){
         old.ident.ids <- levels(object@ident)
-        new.cluster.ids <- 1:length(old.ident.ids)-1
+        old.ident.ids <- sort(old.ident.ids)
+        new.cluster.ids <- as.numeric(as.factor(old.ident.ids))
         object@ident <- plyr::mapvalues(x = object@ident,
                                         from = old.ident.ids,
                                         to = new.cluster.ids)
@@ -386,6 +388,35 @@ SingleFeaturePlot.1 <- function (object = object, feature = feature, pt.size = 1
         }
         return(p)
 }
+
+
+
+# split by ages and TSNEPlot
+TSNEPlotbyAges <- function(object =object){
+    
+    all.cell <- FetchData(object,"conditions")
+    cell.young <- rownames(all.cell)[all.cell$conditions =="young"]
+    cell.aged <- rownames(all.cell)[all.cell$conditions =="aged"]
+    
+    object.young <- SubsetData(object = object,
+                               cells.use =cell.young)
+    object.aged <- SubsetData(object = object,
+                              cells.use =cell.aged)
+    
+    p1 <- TSNEPlot(object.young, do.label = F, do.return = T,
+                   no.legend = T, pt.size = 1)+
+        ggtitle(paste0(deparse(substitute(object)), " in Young mouse"))+
+        theme(text = element_text(size=20),     #larger text including legend title							
+              plot.title = element_text(hjust = 0.5)) #title in middle
+    p2 <- TSNEPlot(object.aged, do.label = F, do.return = T,
+                   no.legend = T, pt.size = 1)+
+        ggtitle(paste0(deparse(substitute(object)), " in Aged mouse"))+
+        theme(text = element_text(size=20),     #larger text including legend title							
+              plot.title = element_text(hjust = 0.5)) #title in middle
+    return(plot_grid(p1, p2, nrow =1))
+}
+
+
 
 TSNEPlot.3D <- function (object, reduction.use = "tsne", dim.1 = 1, dim.2 = 2, dim.3 = 3,
           cells.use = NULL, pt.size = 1, do.return = FALSE, do.bare = FALSE, 
