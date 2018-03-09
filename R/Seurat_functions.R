@@ -28,13 +28,14 @@ FindAllMarkers.UMI <- function (object, genes.use = NULL, logfc.threshold = 0.25
         }, error = function(cond) {
             return(NULL)
         })
-        avg_UMI[[i]] <-rowMeans(as.matrix(x = object@data[, WhichCells(object = object,
+        pct.1_UMI <-rowMeans(as.matrix(x = object@data[, WhichCells(object = object,
                                                                        ident = idents.all[[i]])]))
-        avg_UMI[[i]] <-data.frame(avg_UMI = avg_UMI[[i]])
+        pct.2_UMI <-rowMeans(as.matrix(x = object@data[, WhichCells(object = object,
+                                                                         ident.remove = idents.all[[i]])]))
+        avg_UMI[[i]] <-data.frame(pct.1_UMI, pct.2_UMI)
         genes.de[[i]] <- cbind(genes.de[[i]],
-                               avg_UMI[[i]][,"avg_UMI"][match(rownames(genes.de[[i]]), 
-                                                              rownames(avg_UMI[[i]]))])
-        colnames(genes.de[[i]])[6] <- "avg_UMI"
+                               avg_UMI[[i]][match(rownames(genes.de[[i]]), 
+                                                              rownames(avg_UMI[[i]])),])
         if (do.print) {
             print(paste("Calculating cluster", idents.all[i]))
         }
@@ -86,12 +87,14 @@ FindAllMarkersInSameAge <- function(object,write.csv = TRUE){
                                 cells.use =cell.aged)
         object.young.markers <- FindAllMarkers.UMI(object = object.young,
                                              logfc.threshold = -Inf,
+                                             return.thresh = 1,
                                              test.use = "bimod",
                                              min.pct = -Inf,
                                              min.diff.pct = -Inf,
                                              min.cells = -Inf)
         object.aged.markers <- FindAllMarkers.UMI(object = object.aged, 
                                             logfc.threshold = -Inf,
+                                            return.thresh = 1,
                                             test.use = "bimod",
                                             min.pct = -Inf,
                                             min.diff.pct = -Inf,
@@ -115,7 +118,7 @@ FindAllMarkersInSameAge <- function(object,write.csv = TRUE){
 FindAllMarkersbyAge<- function(object, genes.use = NULL, logfc.threshold = -Inf, 
                               test.use = "bimod", min.pct = -Inf, min.diff.pct = -Inf, 
                               print.bar = TRUE, only.pos = FALSE, max.cells.per.ident = Inf, 
-                              return.thresh = 0.01, do.print = FALSE, random.seed = 1, 
+                              return.thresh = 1, do.print = FALSE, random.seed = 1, 
                               min.cells = -Inf, latent.vars = "nUMI", assay.type = "RNA", 
                               ...) 
 {   
@@ -138,12 +141,14 @@ FindAllMarkersbyAge<- function(object, genes.use = NULL, logfc.threshold = -Inf,
             }, error = function(cond) {
                 return(NULL)
             })
-            avg_UMI[[i]] <-rowMeans(as.matrix(x = object@data[, rownames(cells)[cells$ident == idents.all[i]]]))
-            avg_UMI[[i]] <-data.frame(avg_UMI = avg_UMI[[i]])
+            pct.1_UMI <-rowMeans(as.matrix(x = object@data[, WhichCells(object = object,
+                                            ident = paste0(idents.all[i],"_","young"))]))
+            pct.2_UMI <-rowMeans(as.matrix(x = object@data[, WhichCells(object = object,
+                                            ident = paste0(idents.all[i],"_","aged"))]))
+            avg_UMI[[i]] <-data.frame(pct.1_UMI, pct.2_UMI)
             genes.de[[i]] <- cbind(genes.de[[i]],
-                                           avg_UMI[[i]][,"avg_UMI"][match(rownames(genes.de[[i]]), 
-                                                                          rownames(avg_UMI[[i]]))])
-            colnames(genes.de[[i]])[6] <- "avg_UMI"
+                                   avg_UMI[[i]][match(rownames(genes.de[[i]]), 
+                                                      rownames(avg_UMI[[i]])),])
         }
         gde.all <- data.frame()
         for (i in 1:length(x = idents.all)) {

@@ -168,6 +168,8 @@ table(Endothelial.Cells@ident)
 TSNEPlotbyAges(Endothelial.Cells)
 Endothelial.Cells.markers <- FindAllMarkersInSameAge(Endothelial.Cells, write.csv = TRUE)
 
+
+
 # RPE cells=========
 RPE.cells <- SubsetData(object = mouse_eyes,
                         ident.use = old.ident.ids[(new.cluster.ids %in% "Retinal Pigment Epithelium")])
