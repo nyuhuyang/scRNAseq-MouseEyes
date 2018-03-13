@@ -2,6 +2,7 @@
 .Rhistory
 .Rapp.history
 
+<<<<<<< HEAD
 # files in folders
 data/
 doc/
@@ -13,6 +14,10 @@ output/
 # Session Data files
 .RData
 Rplots.pdf
+=======
+# Session Data files
+.RData
+>>>>>>> d0b94a3b1cfdf3b938b514dea40bba9efce09b58
 
 # Example code in package build process
 *-Ex.R
@@ -40,4 +45,7 @@ vignettes/*.pdf
 # Temporary files created by R markdown
 *.utf8.md
 *.knit.md
+<<<<<<< HEAD
 .Rproj.user
+=======
+>>>>>>> d0b94a3b1cfdf3b938b514dea40bba9efce09b58

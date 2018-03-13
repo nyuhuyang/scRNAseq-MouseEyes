@@ -1,3 +1,4 @@
+<<<<<<< HEAD
 # scRNAseq-MouseEyes
 
 ## Research Background
@@ -151,3 +152,6 @@ Below is a example of `./output/Myeloid.cells_young_vs_aged.csv` file with first
 
 Cluster indicates the original cluster 9 in `./data/mouse_eyes_alignment.Rda`, young vs aged.<br />
 Only RPE (Retinal Pigment Epithelium) is further subjected to a second round of unsupervised analysis following the same approach, resulting in 3 subclusters a tSNE analysis with ~0.05 resolution.
+=======
+# scRNAseq-MouseEyes
+>>>>>>> d0b94a3b1cfdf3b938b514dea40bba9efce09b58
