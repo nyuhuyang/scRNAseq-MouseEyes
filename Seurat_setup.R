@@ -22,10 +22,10 @@ protocols <- c("129_B6","129_B6_aged")
 projects <- c("EC-IB-4698","EC-IB-4867")
 conditions <- c("young", "aged")
 for(i in 1:length(protocols)){
-  mouse_eyes_raw[[i]] <- Read10X(data.dir = paste0("./data/",
-                              protocols[i],"/outs/filtered_gene_bc_matrices/mm10/"))
-  colnames(mouse_eyes_raw[[i]]) <- paste0(conditions[i],
-                                          "_",colnames(mouse_eyes_raw[[i]]))
+    mouse_eyes_raw[[i]] <- Read10X(data.dir = paste0("./data/",
+                                                     protocols[i],"/outs/filtered_gene_bc_matrices/mm10/"))
+    colnames(mouse_eyes_raw[[i]]) <- paste0(conditions[i],
+                                            "_",colnames(mouse_eyes_raw[[i]]))
 }
 mouse_eyes_Seurat <- lapply(mouse_eyes_raw, CreateSeuratObject,
                             min.cells = 3,
@@ -46,7 +46,7 @@ mouse_eyes_Seurat <- lapply(mouse_eyes_Seurat, FindVariableGenes, do.plot = FALS
 g <- lapply(mouse_eyes_Seurat, function(x) head(rownames(x@hvg.info), 1000))
 genes.use <- unique(c(g[[1]],g[[2]]))
 for(i in 1:length(conditions)){
-  genes.use <- intersect(genes.use, rownames(mouse_eyes_Seurat[[i]]@scale.data))
+    genes.use <- intersect(genes.use, rownames(mouse_eyes_Seurat[[i]]@scale.data))
 }
 length(genes.use) # 1/10 of total sample size 11212
 
@@ -54,8 +54,8 @@ length(genes.use) # 1/10 of total sample size 11212
 # run a canonical correlation analysis to identify common sources
 # of variation between the two datasets.
 mouse_eyes <- RunCCA(mouse_eyes_Seurat[[1]],mouse_eyes_Seurat[[2]],
-                          genes.use = genes.use,
-                          num.cc = 30)
+                     genes.use = genes.use,
+                     num.cc = 30)
 save(mouse_eyes, file = "./data/mouse_eyes_alignment.Rda")
 
 # CCA plot CC1 versus CC2 and look at a violin plot
@@ -104,8 +104,8 @@ plot_grid(p1, p2)
 TSNEPlot(object = mouse_eyes,do.label = TRUE, group.by = "ident", 
          do.return = TRUE, no.legend = TRUE,
          pt.size = 1,label.size = 8 )+
-  ggtitle("TSNE plot of all clusters")+
-  theme(text = element_text(size=20),     #larger text including legend title							
-        plot.title = element_text(hjust = 0.5)) #title in middle
+    ggtitle("TSNE plot of all clusters")+
+    theme(text = element_text(size=20),     #larger text including legend title							
+          plot.title = element_text(hjust = 0.5)) #title in middle
 #dev.off()
 save(mouse_eyes, file = "./data/mouse_eyes_alignment.Rda")
