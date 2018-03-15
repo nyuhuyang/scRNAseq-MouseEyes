@@ -129,7 +129,7 @@ new.cluster.ids <- c("Retinal Pigment Epithelium",
                      "Myelinating Schwann cells",
                      "Myeloid Cells",
                      "Lymphoid Cells",
-                     "Pericytes Cells",
+                     "Pericytes",
                      "Myelinating Schwann cells",
                      "Melanocytes")
 mouse_eyes@ident <- plyr::mapvalues(x = mouse_eyes@ident,
