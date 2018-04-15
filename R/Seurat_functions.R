@@ -394,34 +394,48 @@ SingleFeaturePlot.1 <- function (object = object, feature = feature, pt.size = 1
         return(p)
 }
 
-
-
-# split by ages and TSNEPlot
-TSNEPlotbyAges <- function(object =object){
+SplitTSNEPlot <- function(object = mouse_eyes, split.by = "conditions",
+                          range = NULL, return.data = FALSE){
+    "
+    split seurat object by certein criteria, and generate TSNE plot
     
-    all.cell <- FetchData(object,"conditions")
-    cell.young <- rownames(all.cell)[all.cell$conditions =="young"]
-    cell.aged <- rownames(all.cell)[all.cell$conditions =="aged"]
+    Inputs
+    -------------------
+    object: aligned seurat object with labels at object@meta.data$
+    split.by: the criteria to split
+    range: number of output plots, default is all of them.
+    return.data: TRUE/FASLE, return splited ojbect or not.
     
-    object.young <- SubsetData(object = object,
-                               cells.use =cell.young)
-    object.aged <- SubsetData(object = object,
-                              cells.use =cell.aged)
+    Outputs
+    --------------------
+    none: print TSNEplot
+    "
+    cell.all <- FetchData(object,split.by)
+    conditions <- levels(cell.all[,1])
+    cell.subsets <- lapply(conditions, function(x) 
+        rownames(cell.all)[cell.all$conditions == x])
     
-    p1 <- TSNEPlot(object.young, do.label = F, do.return = T,
-                   no.legend = T, pt.size = 1)+
-        ggtitle(paste0(deparse(substitute(object)), " in Young mouse"))+
-        theme(text = element_text(size=20),     #larger text including legend title							
-              plot.title = element_text(hjust = 0.5)) #title in middle
-    p2 <- TSNEPlot(object.aged, do.label = F, do.return = T,
-                   no.legend = T, pt.size = 1)+
-        ggtitle(paste0(deparse(substitute(object)), " in Aged mouse"))+
-        theme(text = element_text(size=20),     #larger text including legend title							
-              plot.title = element_text(hjust = 0.5)) #title in middle
-    return(plot_grid(p1, p2, nrow =1))
+    object.subsets <- list()
+    for(i in 1:length(conditions)){
+        object.subsets[[i]] <- SubsetData(object, cells.use =cell.subsets[[i]])
+    }
+    
+    table(object.subsets[[1]]@ident)
+    
+    p <- list()
+    if(is.null(range)) range <- length(conditions)
+    for(i in 1:range){ 
+        p[[i]] <- TSNEPlot(object = object.subsets[[i]],
+                           do.label = T, group.by = "ident", 
+                           do.return = TRUE, no.legend = TRUE,
+                           pt.size = 1,label.size = 5 )+
+            ggtitle(conditions[i])+
+            theme(text = element_text(size=20),     #larger text including legend title							
+                  plot.title = element_text(hjust = 0.5)) #title in middle
+    }
+    print(do.call(plot_grid, p))
+    if(return.data) return(object.subsets)
 }
-
-
 
 TSNEPlot.3D <- function (object, reduction.use = "tsne", dim.1 = 1, dim.2 = 2, dim.3 = 3,
           cells.use = NULL, pt.size = 1, do.return = FALSE, do.bare = FALSE, 

@@ -20,7 +20,7 @@ source("./R/Seurat_functions.R")
 mouse_eyes_raw <- list()
 protocols <- c("129_B6","129_B6_aged")
 projects <- c("EC-IB-4698","EC-IB-4867")
-conditions <- c("young", "aged")
+conditions <- c("young_129_B6", "aged_129_B6")
 for(i in 1:length(protocols)){
     mouse_eyes_raw[[i]] <- Read10X(data.dir = paste0("./data/",
                                                      protocols[i],"/outs/filtered_gene_bc_matrices/mm10/"))
@@ -34,7 +34,7 @@ mouse_eyes_Seurat <- lapply(mouse_eyes_raw, CreateSeuratObject,
 for(i in 1:length(protocols)) mouse_eyes_Seurat[[i]]@meta.data$conditions <- conditions[i]
 mouse_eyes_Seurat <- lapply(mouse_eyes_Seurat, FilterCells, 
                             subset.names = "nGene", 
-                            low.thresholds = 500, 
+                            low.thresholds = 200, 
                             high.thresholds = Inf)
 mouse_eyes_Seurat <- lapply(mouse_eyes_Seurat, NormalizeData)
 mouse_eyes_Seurat <- lapply(mouse_eyes_Seurat, ScaleData)
@@ -67,32 +67,33 @@ plot_grid(p1, p2)
 
 PrintDim(object = mouse_eyes, reduction.type = "cca", dims.print = 1:2, genes.print = 10)
 
-p3 <- MetageneBicorPlot(mouse_eyes, grouping.var = "conditions", dims.eval = 1:30, 
-                        display.progress = FALSE)
-p3 + geom_smooth(method = 'loess')
-DimHeatmap(object = mouse_eyes, reduction.type = "cca", cells.use = 500, dim.use = 1:9, 
+DimHeatmap(object = mouse_eyes, reduction.type = "cca", cells.use = 500, dim.use = c(1:3,11:13), 
            do.balanced = TRUE)
 
 DimHeatmap(object = mouse_eyes, reduction.type = "cca", cells.use = 500, dim.use = 10:18, 
            do.balanced = TRUE)
 
-PrintDim(object = mouse_eyes, reduction.type = "cca", dims.print = 1:2, 
-         genes.print = 10)
+#======1.3 QC ==================================
+mouse_eyes <- CalcVarExpRatio(object = mouse_eyes, reduction.type = "pca",
+                               grouping.var = "conditions", dims.use = 1:13)
+mouse_eyes <- SubsetData(mouse_eyes, subset.name = "var.ratio.pca",accept.low = 0.5)
 
-
-#======1.3 QC (skip)==================================
-
+mito.genes <- grep(pattern = "^mt-", x = rownames(x = mouse_eyes@data), value = TRUE)
+percent.mito <- Matrix::colSums(mouse_eyes@raw.data[mito.genes, ])/Matrix::colSums(mouse_eyes@raw.data)
+mouse_eyes <- AddMetaData(object = mouse_eyes, metadata = percent.mito, col.name = "percent.mito")
+mouse_eyes <- ScaleData(object = mouse_eyes, genes.use = genes.use, display.progress = FALSE, 
+                         vars.to.regress = "percent.mito")
 
 #======1.4 align seurat objects =========================
 #Now we align the CCA subspaces, which returns a new dimensional reduction called cca.aligned
 
 mouse_eyes <- AlignSubspace(object = mouse_eyes, reduction.type = "cca", grouping.var = "conditions", 
-                            dims.align = 1:20)
+                            dims.align = 1:13)
 #Now we can run a single integrated analysis on all cells!
-mouse_eyes <- RunTSNE(object = mouse_eyes, reduction.use = "cca.aligned", dims.use = 1:20, 
-                      resolution = 0.8, do.fast = TRUE)
-mouse_eyes <- FindClusters(object = mouse_eyes, reduction.type = "cca.aligned", dims.use = 1:20, 
-                           force.recalc = T, save.SNN = TRUE)
+mouse_eyes <- FindClusters(object = mouse_eyes, reduction.type = "cca.aligned", dims.use = 1:13, 
+                           resolution = 0.5, force.recalc = T, save.SNN = TRUE)
+mouse_eyes <- RunTSNE(object = mouse_eyes, reduction.use = "cca.aligned", dims.use = 1:13, 
+                      do.fast = TRUE)
 p1 <- TSNEPlot(mouse_eyes, do.return = T, pt.size = 1, group.by = "conditions")
 p2 <- TSNEPlot(mouse_eyes, do.label = F, do.return = T, pt.size = 1)
 #png('./output/TSNESplot_alignment.png')
