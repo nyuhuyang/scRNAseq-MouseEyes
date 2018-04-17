@@ -5,7 +5,7 @@ FindAllMarkers.UMI <- function (object, genes.use = NULL, logfc.threshold = 0.25
           print.bar = TRUE, only.pos = FALSE, max.cells.per.ident = Inf, 
           return.thresh = 0.01, do.print = FALSE, random.seed = 1, 
           min.cells = 3, latent.vars = "nUMI", assay.type = "RNA", 
-          ...) 
+          ...)
 {
     data.1 <- GetAssayData(object = object, assay.type = assay.type, 
                            slot = "data")
@@ -76,40 +76,40 @@ FindAllMarkers.UMI <- function (object, genes.use = NULL, logfc.threshold = 0.25
 # find and print differentially expressed genes within all major cell types ================
 # combine SubsetData, FindAllMarkers, write.csv parallely
 
-FindAllMarkersInSameAge <- function(object,write.csv = TRUE){
-        all.cell <- FetchData(object,"conditions")
-        cell.young <- rownames(all.cell)[all.cell$conditions =="young"]
-        cell.aged <- rownames(all.cell)[all.cell$conditions =="aged"]
-        
-        object.young <- SubsetData(object = object,
-                                 cells.use =cell.young)
-        object.aged <- SubsetData(object = object,
-                                cells.use =cell.aged)
-        object.young.markers <- FindAllMarkers.UMI(object = object.young,
-                                             logfc.threshold = -Inf,
-                                             return.thresh = 1,
-                                             test.use = "bimod",
-                                             min.pct = -Inf,
-                                             min.diff.pct = -Inf,
-                                             min.cells = -Inf)
-        object.aged.markers <- FindAllMarkers.UMI(object = object.aged, 
-                                            logfc.threshold = -Inf,
-                                            return.thresh = 1,
-                                            test.use = "bimod",
-                                            min.pct = -Inf,
-                                            min.diff.pct = -Inf,
-                                            min.cells = -Inf)
-        object.markers <- list(young = object.young.markers,
-                             aged = object.aged.markers)
-        if(write.csv){
-          mapply(write.csv,
-                 x= object.markers,
-                 #convert variable (object) name into String
-                 file=paste0("./output/",
-                             deparse(substitute(object)), 
-                             ".",names(object.markers),
-                             ".csv"))}
-        return(object.markers)
+SplitFindAllMarkers <- function(object,split.by = "conditions", write.csv = TRUE){
+    "
+    split seurat object by certein criteria, and find all markers+ UMI +adj_p
+    
+    Inputs
+    -------------------
+    object: aligned seurat object with labels at object@meta.data$
+    split.by: the criteria to split
+    write.csv: TRUE/FASLE, write csv files or not.
+    
+    Outputs
+    --------------------
+    object.markers: list of gene markers
+    "
+    object.subsets <- SplitCells(object = object, split.by = split.by)
+    conditions <- object.subsets[[length(object.subsets)]] # levels of conditions
+    
+    object.markers <- list()
+
+    for(i in 1:length(conditions)){ 
+        object.markers[[i]] <- FindAllMarkers.UMI(object = object.subsets[[i]],
+                                         logfc.threshold = -Inf,
+                                         return.thresh = 1,
+                                         test.use = "bimod",
+                                         min.pct = -Inf,
+                                         min.diff.pct = -Inf,
+                                         min.cells = -Inf)
+        if(write.csv) write.csv(object.markers[[i]], 
+                                file=paste0("./output/",
+                                            deparse(substitute(object)), 
+                                            "_",conditions[i],
+                                            ".csv"))
+    }
+    return(object.markers)
 }
 
 
@@ -394,6 +394,37 @@ SingleFeaturePlot.1 <- function (object = object, feature = feature, pt.size = 1
         return(p)
 }
 
+SplitCells <- function(object = mouse_eyes, split.by = "conditions"){
+    "
+    split seurat object by certein criteria
+    
+    Inputs
+    -------------------
+    object: aligned seurat object with labels at object@meta.data$
+    split.by: the criteria to split
+    range: number of output plots, default is all of them.
+    return.data: TRUE/FASLE, return splited ojbect or not.
+    
+    Outputs
+    --------------------
+    object.subsets: list of subseted object by certein conditions,
+                    plus levels of the conditions
+
+    "
+    cell.all <- FetchData(object,split.by)
+    conditions <- levels(cell.all[,1])
+    cell.subsets <- lapply(conditions, function(x) 
+        rownames(cell.all)[cell.all$conditions == x])
+    
+    object.subsets <- list()
+    for(i in 1:length(conditions)){
+        object.subsets[[i]] <- SubsetData(object, cells.use =cell.subsets[[i]])
+    }
+    object.subsets[[i+1]] <- conditions # record conditions in the last return
+    return(object.subsets)
+}
+
+
 SplitTSNEPlot <- function(object = mouse_eyes, split.by = "conditions",
                           range = NULL, return.data = FALSE){
     "
@@ -410,17 +441,8 @@ SplitTSNEPlot <- function(object = mouse_eyes, split.by = "conditions",
     --------------------
     none: print TSNEplot
     "
-    cell.all <- FetchData(object,split.by)
-    conditions <- levels(cell.all[,1])
-    cell.subsets <- lapply(conditions, function(x) 
-        rownames(cell.all)[cell.all$conditions == x])
-    
-    object.subsets <- list()
-    for(i in 1:length(conditions)){
-        object.subsets[[i]] <- SubsetData(object, cells.use =cell.subsets[[i]])
-    }
-    
-    table(object.subsets[[1]]@ident)
+    object.subsets <- SplitCells(object = object, split.by = split.by)
+    conditions <- object.subsets[[length(object.subsets)]] # levels of conditions
     
     p <- list()
     if(is.null(range)) range <- length(conditions)

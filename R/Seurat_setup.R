@@ -105,7 +105,7 @@ plot_grid(p1, p2)
 TSNEPlot(object = mouse_eyes,do.label = TRUE, group.by = "ident", 
          do.return = TRUE, no.legend = TRUE,
          pt.size = 1,label.size = 8 )+
-    ggtitle("TSNE plot of all clusters")+
+    ggtitle("young vs aged seurat v2.2.0")+
     theme(text = element_text(size=20),     #larger text including legend title							
           plot.title = element_text(hjust = 0.5)) #title in middle
 #dev.off()

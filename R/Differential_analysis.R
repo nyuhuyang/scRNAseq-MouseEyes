@@ -35,7 +35,7 @@ new.cluster.ids <- c("Retinal Pigment Epithelium",
 #in the different cell types and subtypes. 
 #It will also be interesting to check if there is some subtype enriched in 129_B6 compared to 129_B6_aged or viceversa. 
 print("3.4 Compare DE across all major cell types")
-mouse_eyes.markers <- FindAllMarkersInSameAge(object = mouse_eyes)
+mouse_eyes.markers <- SplitFindAllMarkers(object = mouse_eyes)
 
 mouse_eyes.gde <- FindAllMarkersbyAge(object = mouse_eyes)
 write.csv(x= mouse_eyes.gde, file="./output/mouse_eyes_young_vs_aged.csv")
@@ -48,7 +48,7 @@ lnames = load(file = "./data/mouse_eyes_alignment.Rda")
 lnames
 # keep the original ident name intact
 print("3.5 Compare DE between subcluster within all major cell types, and visualize all major cell types")
-# Myeloid Cells===============
+# SubsetData===============
 T.cells <- SubsetData(object = mouse_eyes,
                             ident.use = old.ident.ids[(new.cluster.ids %in% "T cells")])
 Monocytes <- SubsetData(object = mouse_eyes,
@@ -62,45 +62,29 @@ Pericytes <- SubsetData(object = mouse_eyes,
                   ident.use = old.ident.ids[(new.cluster.ids %in% "Mesenchymal cells") | 
                                             (new.cluster.ids %in% "Pericytes") |
                                             (new.cluster.ids %in% "Smooth muscle cells")])
+# split TSNE plot=============
+SplitTSNEPlot(T.cells)
 SplitTSNEPlot(Monocytes)
 SplitTSNEPlot(EC)
 SplitTSNEPlot(RPE)
 SplitTSNEPlot(Pericytes)
-SplitTSNEPlot(Monocytes)
-SplitTSNEPlot(T.cells)
 
-table(Pericytes@ident)
 
-Monocytes.markers <- FindAllMarkersInSameAge(Monocytes, write.csv = TRUE)
+# split and find all markers
+table(T.cells@ident)
+T.cells.markers <- SplitFindAllMarkers(T.cells, write.csv = TRUE)
 
-# Perictyes==========
-Pericytes <- SubsetData(object = mouse_eyes,
-                        ident.use = old.ident.ids[(new.cluster.ids %in% "Pericytes")])
-table(Pericytes@ident)
-SplitTSNEPlot(Pericytes)
-Pericytes.markers <- FindAllMarkersInSameAge(Pericytes, write.csv = TRUE)
+table(Monocytes@ident)
+Monocytes.markers <- SplitFindAllMarkers(Monocytes, write.csv = TRUE)
 
-# Endothelial Cells==========
-EC <- SubsetData(object = mouse_eyes,
-                                ident.use = old.ident.ids[(new.cluster.ids %in% "Endothelial Cells")])
 table(EC@ident)
-SplitTSNEPlot(EC)
-EC.markers <- FindAllMarkersInSameAge(EC, write.csv = TRUE)
+EC.markers <- SplitFindAllMarkers(EC, write.csv = TRUE)
 
+table(RPE@ident)
+RPE.markers <- SplitFindAllMarkers(RPE, write.csv = TRUE)
 
-
-# RPE cells=========
-RPE.cells <- SubsetData(object = mouse_eyes,
-                        ident.use = old.ident.ids[(new.cluster.ids %in% "Retinal Pigment Epithelium")])
-RPE.cells <- FindClusters(object = RPE.cells, 
-                          reduction.type = "tsne", 
-                          dims.use = 1:2, 
-                          resolution = 0.05,
-                          save.SNN = TRUE)
-table(RPE.cells@ident)
-SplitTSNEPlot(RPE.cells)
-
-RPE.cells.markers <- FindAllMarkersInSameAge(RPE.cells, write.csv = TRUE)
+table(Pericytes@ident)
+Pericytes.markers <- SplitFindAllMarkers(Pericytes, write.csv = TRUE)
 
 #3.6 Compare subcluster between aged vs young===============
 print("3.6 Compare subcluster between aged vs young")
@@ -120,5 +104,5 @@ Endothelial.gde <- FindAllMarkersbyAge(EC)
 write.csv(x= Endothelial.gde, file="./output/Endothelium_young_vs_aged.csv")
 
 # RPE cells=========
-RPE.gde <- FindAllMarkersbyAge(RPE.cells)
+RPE.gde <- FindAllMarkersbyAge(RPE)
 write.csv(x= RPE.gde, file="./output/RPE_young_vs_aged.csv")
