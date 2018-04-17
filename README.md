@@ -1,4 +1,3 @@
-<<<<<<< HEAD
 # scRNAseq-MouseEyes
 
 ## Research Background
@@ -14,9 +13,9 @@ Chromium single-cell RNA-seq outputs were processed by Cell Ranger analysis pipe
 ## How to use this repository
 
 #### Software Setup
-R version 3.4.3 (Did't test other versions)<br />
+R version 3.4.3 <br />
 dplyr_0.7.4 (Did't test other versions)<br />
-Seurat_2.2.1 (Must be >2.2.0 )<br />
+Seurat_2.1.0 (Works for Seurat > 2.1.0 with slightly different results )<br />
 
 After pulling this repository, create folders **_data_** and **_output_** in the top working folder.
 Move Cell Ranger analysis results into **_data_** folder.
@@ -152,6 +151,6 @@ Below is a example of `./output/Myeloid.cells_young_vs_aged.csv` file with first
 
 Cluster indicates the original cluster 9 in `./data/mouse_eyes_alignment.Rda`, young vs aged.<br />
 Only RPE (Retinal Pigment Epithelium) is further subjected to a second round of unsupervised analysis following the same approach, resulting in 3 subclusters a tSNE analysis with ~0.05 resolution.
+
 =======
 # scRNAseq-MouseEyes
->>>>>>> d0b94a3b1cfdf3b938b514dea40bba9efce09b58
