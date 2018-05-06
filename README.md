@@ -13,7 +13,7 @@ Chromium single-cell RNA-seq outputs were processed by Cell Ranger analysis pipe
 ## How to use this repository
 
 #### Software Setup
-R version 3.4.3 http://cran.us.r-project.org/bin/macosx/R-3.4.1.pkg <br />
+R version 3.4.3 http://cran.us.r-project.org/bin/macosx/R-3.4.3.pkg <br />
 dplyr_0.7.4 (Did't test other versions)<br />
 Seurat_2.1.0 (Works for Seurat > 2.1.0 with slightly different results )<br />
 
