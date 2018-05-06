@@ -15,7 +15,7 @@ Chromium single-cell RNA-seq outputs were processed by Cell Ranger analysis pipe
 #### Software Setup
 R version 3.4.3 http://cran.us.r-project.org/bin/macosx/R-3.4.3.pkg <br />
 dplyr_0.7.4 (Did't test other versions)<br />
-Seurat_2.1.0 https://cran.r-project.org/src/contrib/Archive/Seurat/Seurat_2.1.0.tar.gz (Works for Seurat > 2.1.0 with slightly different results )<br />
+Seurat_2.1.0 https://cran.r-project.org/src/contrib/Archive/Seurat/Seurat_2.1.0.tar.gz (other Seurat versions will generate slightly different results )<br />
 
 After pulling this repository, create folders **_data_** and **_output_** in the top working folder.
 Move Cell Ranger analysis results into **_data_** folder.
@@ -44,8 +44,8 @@ Multiple plots and table will be generated, save them if you want. I prefer to k
 #### 3.1~3.3 Visualization
 `TSNEPlot()`, `SplitDotPlotGG()`,`ggplot()+LabelUR()+LabelLR()` are implemented for visualising differential expressed genes across conditions.
 
-#### 3.4~3.7 Generate csv files with differential expression comparision
-`FindAllMarkersInSameAge()` can split seurat data by age (aged vs. young), find All gene Markers differentially expressed among clusters with in the same age, calculate average UMI, and generate csv files in **_output_** folder.
+#### 3.4~3.7 Generate CSV files with differential expression comparison
+`FindAllMarkersInSameAge()` can split Seurat data by age (aged vs. young), find All gene Markers differentially expressed among clusters within the same age, calculate average UMI, and generate CSV files in **_output_** folder.
 
 `FindAllMarkersbyAge()` can rename cell identity by age (aged vs. young), find All gene Markers
 differentially expressed between aged and young strains, calculate average UMI, and generate CSV files in **_output_** folder.
@@ -63,12 +63,12 @@ Below is a example of `./output/mouse_eyes.aged.csv` file with first 6 rows.
 
 The results data frame has the following columns :
 
-p_val : p_val (unadjusted) is calculated using likelihood-ratio test for single cell gene expression, (McDavid et al., Bioinformatics, 2013) <br />
-avg_logFC : log fold-chage of the average expression between the two groups. Positive values indicate that the gene is more highly expressed in the first group.<br />
-pct.1 : The percentage of cells where the gene is detected in the first group.<br />
-pct.2 : The percentage of cells where the gene is detected in the second group.<br />
-p_val_adj : Adjusted p-value, based on bonferroni correction using all genes in the dataset.<br />
-avg_UMI : average UMI of the cluster.<br />
+p_val: p_val (unadjusted) is calculated using likelihood-ratio test for single-cell gene expression, (McDavid et al., Bioinformatics, 2013) <br />
+avg_logFC: log fold-change of the average expression between the two groups. Positive values indicate that the gene is more highly expressed in the first group.<br />
+pct.1: The percentage of cells where the gene is detected in the first group.<br />
+pct.2: The percentage of cells where the gene is detected in the second group.<br />
+p_val_adj: Adjusted p-value, based on Bonferroni correction using all genes in the dataset.<br />
+avg_UMI: average UMI of the cluster.<br />
 cluster : either cell types or original clusters in `./data/mouse_eyes_alignment.Rda`. Will be specified in later section.<br />
 row.name and gene column are identical.<br />
 
@@ -149,7 +149,7 @@ Below is a example of `./output/Myeloid.cells_young_vs_aged.csv` file with first
 |   Ttr | 3.45e-12 | -1.3104 | 0.870 | 1.000 | 5.73e-08 | 2.485 | 9_young_vs_aged  | Ttr
 
 
-Cluster indicates the original cluster 9 in `./data/mouse_eyes_alignment.Rda`, young vs aged.<br />
+Cluster indicates the original cluster 9 in `./data/mouse_eyes_alignment.Rda`, young vs. aged.<br />
 Only RPE (Retinal Pigment Epithelium) is further subjected to a second round of unsupervised analysis following the same approach, resulting in 3 subclusters a tSNE analysis with ~0.05 resolution.
 
 =======
