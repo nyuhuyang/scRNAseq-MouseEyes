@@ -591,3 +591,6 @@ TSNEPlot.3D <- function (object, reduction.use = "tsne", dim.1 = 1, dim.2 = 2, d
                 print(p3)
         }
 }
+#=====Clean memory======================
+#WGCNA::collectGarbage()
+
