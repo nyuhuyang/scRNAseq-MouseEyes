@@ -21,7 +21,7 @@ After pulling this repository, create folders **_data_** and **_output_** in the
 Move Cell Ranger analysis results into **_data_** folder.
 
 ### 1. Seurat_setup.R
-Unsupervised cell clustering analysis was carried out using the Seurat 2.2 R package. Cells with <500 genes and genes detected within <3 cells were excluded from the analysis. Gene expression raw counts were normalized following a global-scaling normalization method with a scale factor of 10,000 and a log transformation, using the Seurat NormalizeData function. The top 1000 highly variable genes from young C57BL/6J and aged C57BL/6J datasets were selected, followed by a canonical correlation analysis (CCA) to identify common sources of variation between the two datasets and minimize the batch effect. The first 20 CCA results were chosen for principal component analysis (PCA). Cells were used for 2-dimensional t-Distributed Stochastic Neighbor Embedding (tSNE) (ref van der maaten and hinton 2008) with 0.8 resolution.
+Unsupervised cell clustering analysis was carried out using the Seurat 2.2 R package. Cells with <500 genes and genes detected within <3 cells were excluded from the analysis. Gene expression raw counts were normalized following a global-scaling normalization method with a scale factor of 10,000 and a log transformation, using the Seurat NormalizeData function. The top 1000 highly variable genes from young C57BL/6J and aged C57BL/6J datasets were selected, followed by canonical correlation analysis (CCA) to identify common sources of variation between the two datasets and minimize the batch effect. The first 20 CCA results were chosen for principal component analysis (PCA). Cells were used for 2-dimensional t-Distributed Stochastic Neighbor Embedding (tSNE) (ref van der maaten and hinton 2008) with 0.8 resolution.
 
  After running this script, a `mouse_eyes_alignment.Rda` file will be generated inside **_data_** folder.
  Do not modify any files in **_data_** folder.
@@ -38,7 +38,7 @@ Melanocytes were identified by Mlana and Pmel.<br />
 Myelinating Schwann cells were identified by Mbp and Mpz.<br />
 Retinal pigment epitheliums were identified by Rlbp1 and Rpe65.<br />
 
-`DotPlot` is implemented for visualising differential expressed marker genes.
+`DotPlot` is implemented for visualizing differential expressed marker genes.
 Multiple plots and table will be generated, save them if you want. I prefer to keep the original identity of `mouse_eyes_alignment.Rda` intact for further downstream analysis.
 
 ### 3. Differential_analysis.R
@@ -50,7 +50,7 @@ Modified FindAllMarkers() `FindAllMarkers.UMI()` will generate similar dataframe
 Generate CSV file in **_output_** folder.
 
 #### 3.2~3.3 Zoom in Retinal pigment epithelium and Hematopoietic cells
-Further subset the cell types into small clusters.
+Further, subset the cell types into small clusters.
 Re-run `RunPCA()`, `FindClusters()`,`RunTSNE()`
 Generate CSV file in **_output_** folder.
 
@@ -58,8 +58,8 @@ Below is a example of `./output/129_B6.csv` file with first 6 rows.
 
 | row.name |   p_val | avg_logFC |  pct.1 |  pct.2 | p_val_adj |  pct.1_UMI |  pct.2_UMI |  cluster | gene
 | -----    | ------  | -------- | ----  | ----- | ------- | ------- | ------| --- | --- |
-| Lum	| 0.000 | 1.596 | 0.983 | 0.236 | 0.000 | 3.048 | 0.567 | 0)Pericytes | Lum
-| Cygb	| 0.000 | 1.531 | 0.981 | 0.311 | 0.000 | 2.721 | 0.651 | 0)Pericytes | Cygb
+| Lum    | 0.000 | 1.596 | 0.983 | 0.236 | 0.000 | 3.048 | 0.567 | 0)Pericytes | Lum
+| Cygb    | 0.000 | 1.531 | 0.981 | 0.311 | 0.000 | 2.721 | 0.651 | 0)Pericytes | Cygb
 | Igfbp4 | 0.000 | 1.507 | 1.000 | 0.720 | 0.000 | 3.897 | 1.773 | 0)Pericytes | Igfbp4
 | Serpine2 | 0.000 | 1.462 | 0.999 | 0.506 | 0.000 | 3.488 | 1.191 | 0)Pericytes | Serpine2
 | Dcn | 0.000 | 0.964 | 0.968 | 0.347 | 0.000 | 3.400 | 0.983 | 0)Pericytes | Dcn
@@ -73,7 +73,7 @@ avg_logFC: log fold-change of the average expression between the two groups. Pos
 pct.1: The percentage of cells where the gene is detected in the first group.<br />
 pct.2: The percentage of cells where the gene is detected in the second group.<br />
 p_val_adj: Adjusted p-value, based on Benjamini & Hochberg (1995) ("BH" or its alias "fdr")<br />
-pct.1_UMI is nUMI of current cluster.
+pct.1_UMI is nUMI of the current cluster.
 pct.2_UMI is average nUMI of rest of clusters.<br />
 cluster : either cell types or original clusters in `./data/mouse_eyes_alignment.Rda`.
 row.name and gene column are identical.<br />
