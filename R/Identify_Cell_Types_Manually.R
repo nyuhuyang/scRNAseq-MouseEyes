@@ -117,6 +117,12 @@ DotPlot(mouse_eyes, genes.plot = rev(markers.to.plot),
         cols.use = c("blue","red"), x.lab.rot = T, plot.legend = F,
         dot.scale = 8, do.return = T)
 
+freq_table <- prop.table(x = table(mouse_eyes@ident, mouse_eyes@meta.data[, "conditions"]),
+margin = 2)
+barplot(height = freq_table)
+freq_table
+table(mouse_eyes@meta.data[, "conditions"])
+
 #=====2.3 tsne plot=============================
 lnames = load(file = "./data/mouse_eyes_alignment.Rda")
 lnames
@@ -145,13 +151,9 @@ TSNEPlot(object = mouse_eyes, no.legend = TRUE, do.label = TRUE,
   ggtitle("TSNE plot of major cell types")+
   theme(text = element_text(size=20),     #larger text including legend title							
         plot.title = element_text(hjust = 0.5)) #title in middle
-freq_table <- prop.table(x = table(mouse_eyes@ident, mouse_eyes@meta.data[, "conditions"]), 
-                         margin = 2)
-barplot(height = freq_table)
-freq_table
-table(mouse_eyes@meta.data[, "conditions"])
 
-#====== 2.3 Compare cell type changes across conditions  ==========================================
+
+#====== 2.4 Compare cell type changes across conditions  ==========================================
 # the two patients profiled have very different composition
 # Compare clusters for each dataset
 SplitTSNEPlot(mouse_eyes, "conditions",do.label = F, 

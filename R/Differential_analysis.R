@@ -25,7 +25,7 @@ new.cluster.ids <- c("0) Pericytes",
                      "1) Pericytes",
                      "2) Endothelial cells",
                      "3) Smooth muscle cells",
-                     "4) Retinal pigment epithelium",
+                     "4) Retinal pigmented epithelium",
                      "5) Endothelial cells",
                      "6) Pericytes",
                      "7) Pericytes",
@@ -53,9 +53,9 @@ write.csv(x= mouse_eyes_129_B6.gde, file="./output/129_B6.csv")
 print("3.2 Compare DE between subcluster within all major cell types, and visualize all major cell types")
 # 3.2.1 SubsetData and further split RPE ===============
 RPE <- SubsetData(object = mouse_eyes_129_B6,random.seed = 1,
-                  ident.use = "4) Retinal pigment epithelium")
+                  ident.use = "4) Retinal pigmented epithelium")
 #deselect.cells <- TSNEPlot(object = RPE, do.identify = T)
-set.seed(1)
+set.seed(42)
 select.cells <- WhichCells(object = RPE)
 deselect.cells <- which(select.cells == "129_B6_CGCTATCTCAGGTTCA")
 select.cells <- select.cells[-deselect.cells]
@@ -82,7 +82,7 @@ Hema <- SubsetData(object = mouse_eyes_129_B6,
 Hema <- FindVariableGenes(object = Hema, mean.function = ExpMean, dispersion.function = LogVMR, 
                          do.plot = FALSE)
 Hema_hv.genes <- head(rownames(Hema@hvg.info), 1000)
-set.seed(1)
+set.seed(42)
 Hema <- RunPCA(object = Hema, pc.genes = Hema_hv.genes, pcs.compute = 20, do.print = F, 
               pcs.print = 1:5, genes.print = 5)
 #PCElbowPlot(object = Hema)
