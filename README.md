@@ -130,4 +130,4 @@ loaded via a namespace (and not attached):
  grid_3.4.4           data.table_1.10.4-3  FNN_1.1              ModelMetrics_1.1.0  
  digest_0.6.15        diptest_0.75-7       xtable_1.8-2         numDeriv_2016.8-1
  tidyr_0.8.0          R.utils_2.6.0        stats4_3.4.4         munsell_0.4.3    
- registry_0.5         magic_1.5-8  
+ registry_0.5         magic_1.5-8
