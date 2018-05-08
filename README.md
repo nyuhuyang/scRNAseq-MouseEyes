@@ -42,9 +42,9 @@ Retinal pigment epitheliums were identified by Rlbp1 and Rpe65.<br />
 Multiple plots and table will be generated, save them if you want. I prefer to keep the original identity of `mouse_eyes_alignment.Rda` intact for further downstream analysis.
 
 ### 3. Differential_analysis.R
-Modified FindAllMarkers() `FindAllMarkers.UMI()` will generate similar dataframe plus two extra columns `pct.1_UMI` and `pct.2_UMI` to record nUMI. `pct.1_UMI` is nUMI of current cluster, `pct.2_UMI` is average nUMI of rest of clusters.
-`FindAllMarkers(object, test.use = "bimod")` : Likelihood-ratio test for single cell gene expression, (McDavid et al., Bioinformatics, 2013)
-`p.adjust(p, method = "BH")`:Benjamini & Hochberg (1995) ("BH" or its alias "fdr")
+Modified FindAllMarkers() `FindAllMarkers.UMI()` will generate similar dataframe plus two extra columns `pct.1_UMI` and `pct.2_UMI` to record nUMI. `pct.1_UMI` is nUMI of current cluster, `pct.2_UMI` is average nUMI of rest of clusters.<br />
+`FindAllMarkers(object, test.use = "bimod")` : Likelihood-ratio test for single cell gene expression, (McDavid et al., Bioinformatics, 2013)<br />
+`p.adjust(p, method = "BH")`:Benjamini & Hochberg (1995) ("BH" or its alias "fdr").<br />
 
 #### 3.1 Compare differential exression across all clusters, generate CSV files
 Generate CSV file in **_output_** folder.
