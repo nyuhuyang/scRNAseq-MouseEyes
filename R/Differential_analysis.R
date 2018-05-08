@@ -8,7 +8,13 @@ library(Seurat)
 library(dplyr)
 source("./R/Seurat_functions.R")
 
-#==3.1 detect changes in gene expression between 129_B6 and 129_B6_aged sub celltype=====
+#3.1  Compare DE across all major cell types==================
+#We would need the data for all clusters, as well the subclusters (RPE and hematopoietic cells).
+#detect changes in gene expression between 129_B6 and B6, 
+#in the different cell types and subtypes. 
+#It will also be interesting to check if there is some subtype enriched in 129_B6 compared to B6 or viceversa. 
+
+# 3.1.1 load data
 # Rename ident
 lnames = load(file = "./data/mouse_eyes_alignment.Rda")
 lnames
@@ -31,25 +37,21 @@ new.cluster.ids <- c("0) Pericytes",
 mouse_eyes@ident <- plyr::mapvalues(x = mouse_eyes@ident,
                                     from = old.ident.ids,
                                     to = new.cluster.ids)
-#3.4  Compare DE across all major cell types
-#We would need the data for all clusters, as well the subclusters (RPE and hematopoietic cells).
-#detect changes in gene expression between 129_B6 and 129_B6_aged, 
-#in the different cell types and subtypes. 
-#It will also be interesting to check if there is some subtype enriched in 129_B6 compared to 129_B6_aged or viceversa. 
-print("3.4 Compare DE across all major cell types")
+print("3.1 Compare DE across all major cell types")
 
+# 3.1.2 FindAllMarkers.UMI
 mouse_eyes_Split <- SplitCells(object = mouse_eyes, split.by = "conditions")
 mouse_eyes_129_B6 <- mouse_eyes_Split[[1]]
 mouse_eyes_129_B6.gde <- FindAllMarkers.UMI(object = mouse_eyes_129_B6)
-write.csv(x= mouse_eyes_129_B6, file="./output/129_B6.csv")
+write.csv(x= mouse_eyes_129_B6.gde, file="./output/129_B6.csv")
 
-# 3.5 Compare differential expression between subcluster within all major cell types
+# 3.2 Compare differential expression between subcluster within all major cell types
 # plus visualize all major cell types.
 #http://satijalab.org/seurat/de_vignette.html#perform-de-analysis-using-alternative-tests
 # Compare subclusters within aged and young
 # keep the original ident name intact
-print("3.5 Compare DE between subcluster within all major cell types, and visualize all major cell types")
-# 3.5.1 SubsetData and further split RPE ===============
+print("3.2 Compare DE between subcluster within all major cell types, and visualize all major cell types")
+# 3.2.1 SubsetData and further split RPE ===============
 RPE <- SubsetData(object = mouse_eyes_129_B6,random.seed = 1,
                   ident.use = "4) Retinal pigment epithelium")
 #deselect.cells <- TSNEPlot(object = RPE, do.identify = T)
@@ -74,7 +76,7 @@ TSNEPlot(object = RPE, no.legend = TRUE, do.label = TRUE, pt.size = 2,
 RPE.gde <- FindAllMarkers.UMI(object = RPE,test.use = "bimod")
 write.csv(x= RPE.gde, file="./output/129_B6_RPE.csv")
 
-# 3.5.2 SubsetData and further split Hematopoietic cells ===============
+# 3.2.2 SubsetData and further split Hematopoietic cells ===============
 Hema <- SubsetData(object = mouse_eyes_129_B6,
                    ident.use = "8) Hematopoietic cells")
 Hema <- FindVariableGenes(object = Hema, mean.function = ExpMean, dispersion.function = LogVMR, 
