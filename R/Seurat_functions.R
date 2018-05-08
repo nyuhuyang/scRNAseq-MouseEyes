@@ -1,7 +1,7 @@
 # combine FindAllMarkers and calculate average UMI
 
 FindAllMarkers.UMI <- function (object, genes.use = NULL, logfc.threshold = 0.25, 
-          test.use = "wilcox", min.pct = 0.1, min.diff.pct = -Inf, 
+          test.use = "bimod", min.pct = 0.1, min.diff.pct = -Inf, 
           print.bar = TRUE, only.pos = FALSE, max.cells.per.ident = Inf, 
           return.thresh = 0.01, do.print = FALSE, random.seed = 1, 
           min.cells = 3, latent.vars = "nUMI", assay.type = "RNA", 
@@ -18,7 +18,7 @@ FindAllMarkers.UMI <- function (object, genes.use = NULL, logfc.threshold = 0.25
     avg_UMI <- list()
     for (i in 1:length(x = idents.all)) {
         genes.de[[i]] <- tryCatch({
-            FindMarkers(object = object, assay.type = assay.type, 
+            FindMarkers.1(object = object, assay.type = assay.type, 
                         ident.1 = idents.all[i], ident.2 = NULL, genes.use = genes.use, 
                         logfc.threshold = logfc.threshold, test.use = test.use, 
                         min.pct = min.pct, min.diff.pct = min.diff.pct, 
@@ -72,6 +72,175 @@ FindAllMarkers.UMI <- function (object, genes.use = NULL, logfc.threshold = 0.25
     return(gde.all)
 }
 
+
+FindMarkers.1 <- function (object, ident.1, ident.2 = NULL, genes.use = NULL, 
+          logfc.threshold = 0.25, test.use = "wilcox", min.pct = 0.1, 
+          min.diff.pct = -Inf, print.bar = TRUE, only.pos = FALSE, 
+          max.cells.per.ident = Inf, random.seed = 1, latent.vars = "nUMI", 
+          min.cells = 3, pseudocount.use = 1, assay.type = "RNA", 
+          ...) 
+{
+        data.use <- GetAssayData(object = object, assay.type = assay.type, 
+                                 slot = "data")
+        genes.use <- Seurat:::SetIfNull(x = genes.use, default = rownames(x = data.use))
+        methods.noprefiliter <- c("DESeq2", "zingeR")
+        if (test.use %in% methods.noprefiliter) {
+                genes.use <- rownames(x = data.use)
+                min.diff.pct <- -Inf
+                logfc.threshold <- 0
+        }
+        if (length(x = as.vector(x = ident.1) > 1) && any(as.character(x = ident.1) %in% 
+                                                          object@cell.names)) {
+                cells.1 <- intersect(x = ident.1, y = object@cell.names)
+        }
+        else {
+                cells.1 <- WhichCells(object = object, ident = ident.1)
+        }
+        if (length(x = as.vector(x = ident.2) > 1) && any(as.character(x = ident.2) %in% 
+                                                          object@cell.names)) {
+                cells.2 <- intersect(x = ident.2, y = object@cell.names)
+        }
+        else {
+                if (is.null(x = ident.2)) {
+                        cells.2 <- WhichCells(object = object, cells.use = setdiff(object@cell.names, 
+                                                                                   cells.1))
+                }
+                else {
+                        cells.2 <- WhichCells(object = object, ident = ident.2)
+                }
+        }
+        cells.2 <- setdiff(x = cells.2, y = cells.1)
+        if (length(x = cells.1) == 0) {
+                print(paste("Cell group 1 is empty - no cells with identity class", 
+                            ident.1))
+                return(NULL)
+        }
+        if (length(x = cells.2) == 0) {
+                print(paste("Cell group 2 is empty - no cells with identity class", 
+                            ident.2))
+                return(NULL)
+        }
+        if (length(cells.1) < min.cells) {
+                stop(paste("Cell group 1 has fewer than", as.character(min.cells), 
+                           "cells in identity class", ident.1))
+        }
+        if (length(cells.2) < min.cells) {
+                stop(paste("Cell group 2 has fewer than", as.character(min.cells), 
+                           " cells in identity class", ident.2))
+        }
+        thresh.min <- 0
+        data.temp1 <- round(x = apply(X = data.use[genes.use, cells.1, 
+                                                   drop = F], MARGIN = 1, FUN = function(x) {
+                                                           return(sum(x > thresh.min)/length(x = x))
+                                                   }), digits = 3)
+        data.temp2 <- round(x = apply(X = data.use[genes.use, cells.2, 
+                                                   drop = F], MARGIN = 1, FUN = function(x) {
+                                                           return(sum(x > thresh.min)/length(x = x))
+                                                   }), digits = 3)
+        data.alpha <- cbind(data.temp1, data.temp2)
+        colnames(x = data.alpha) <- c("pct.1", "pct.2")
+        alpha.min <- apply(X = data.alpha, MARGIN = 1, FUN = max)
+        names(x = alpha.min) <- rownames(x = data.alpha)
+        genes.use <- names(x = which(x = alpha.min > min.pct))
+        if (length(x = genes.use) == 0) {
+                stop("No genes pass min.pct threshold")
+        }
+        alpha.diff <- alpha.min - apply(X = data.alpha, MARGIN = 1, 
+                                        FUN = min)
+        genes.use <- names(x = which(x = alpha.min > min.pct & alpha.diff > 
+                                             min.diff.pct))
+        if (length(x = genes.use) == 0) {
+                stop("No genes pass min.diff.pct threshold")
+        }
+        data.1 <- apply(X = data.use[genes.use, cells.1, drop = F], 
+                        MARGIN = 1, FUN = function(x) log(x = mean(x = expm1(x = x)) + 
+                                                                  pseudocount.use))
+        data.2 <- apply(X = data.use[genes.use, cells.2, drop = F], 
+                        MARGIN = 1, FUN = function(x) log(x = mean(x = expm1(x = x)) + 
+                                                                  pseudocount.use))
+        total.diff <- (data.1 - data.2)
+        if (!only.pos) 
+                genes.diff <- names(x = which(x = abs(x = total.diff) > 
+                                                      logfc.threshold))
+        if (only.pos) 
+                genes.diff <- names(x = which(x = total.diff > logfc.threshold))
+        genes.use <- intersect(x = genes.use, y = genes.diff)
+        if (length(x = genes.use) == 0) {
+                stop("No genes pass logfc.threshold threshold")
+        }
+        if (max.cells.per.ident < Inf) {
+                set.seed(seed = random.seed)
+                if (length(cells.1) > max.cells.per.ident) 
+                        cells.1 = sample(x = cells.1, size = max.cells.per.ident)
+                if (length(cells.2) > max.cells.per.ident) 
+                        cells.2 = sample(x = cells.2, size = max.cells.per.ident)
+        }
+        if (test.use == "bimod") {
+                to.return <- DiffExpTest(object = object, assay.type = assay.type, 
+                                         cells.1 = cells.1, cells.2 = cells.2, genes.use = genes.use, 
+                                         print.bar = print.bar)
+        }
+        if (test.use == "roc") {
+                to.return <- MarkerTest(object = object, assay.type = assay.type, 
+                                        cells.1 = cells.1, cells.2 = cells.2, genes.use = genes.use, 
+                                        print.bar = print.bar)
+        }
+        if (test.use == "t") {
+                to.return <- DiffTTest(object = object, assay.type = assay.type, 
+                                       cells.1 = cells.1, cells.2 = cells.2, genes.use = genes.use, 
+                                       print.bar = print.bar)
+        }
+        if (test.use == "tobit") {
+                to.return <- TobitTest(object = object, assay.type = assay.type, 
+                                       cells.1 = cells.1, cells.2 = cells.2, genes.use = genes.use, 
+                                       print.bar = print.bar)
+        }
+        if (test.use == "negbinom") {
+                to.return <- NegBinomDETest(object = object, assay.type = assay.type, 
+                                            cells.1 = cells.1, cells.2 = cells.2, genes.use = genes.use, 
+                                            latent.vars = latent.vars, print.bar = print.bar, 
+                                            min.cells = min.cells)
+        }
+        if (test.use == "poisson") {
+                to.return <- PoissonDETest(object = object, assay.type = assay.type, 
+                                           cells.1 = cells.1, cells.2 = cells.2, genes.use = genes.use, 
+                                           latent.vars = latent.vars, print.bar = print.bar)
+        }
+        if (test.use == "MAST") {
+                to.return <- MASTDETest(object = object, assay.type = assay.type, 
+                                        cells.1 = cells.1, cells.2 = cells.2, genes.use = genes.use, 
+                                        latent.vars = latent.vars, ...)
+        }
+        if (test.use == "wilcox") {
+                to.return <- WilcoxDETest(object = object, assay.type = assay.type, 
+                                          cells.1 = cells.1, cells.2 = cells.2, genes.use = genes.use, 
+                                          print.bar = print.bar, ...)
+        }
+        if (test.use == "DESeq2") {
+                to.return <- DESeq2DETest(object = object, assay.type = assay.type, 
+                                          cells.1 = cells.1, cells.2 = cells.2, genes.use = genes.use, 
+                                          ...)
+        }
+        to.return[, "avg_logFC"] <- total.diff[rownames(x = to.return)]
+        to.return <- cbind(to.return, data.alpha[rownames(x = to.return), 
+                                                 ])
+        to.return$p_val_adj = p.adjust(p = to.return$p_val, method = "BH", 
+                                       n = nrow(GetAssayData(object = object, assay.type = assay.type, 
+                                                             slot = "data")))
+        if (test.use == "roc") {
+                to.return <- to.return[order(-to.return$power, -to.return$avg_logFC), 
+                                       ]
+        }
+        else {
+                to.return <- to.return[order(to.return$p_val, -to.return$avg_logFC), 
+                                       ]
+        }
+        if (only.pos) {
+                to.return <- subset(x = to.return, subset = avg_logFC > 
+                                            0)
+        }
+        return(to.return)
+}
 
 # find and print differentially expressed genes within all major cell types ================
 # combine SubsetData, FindAllMarkers, write.csv parallely
@@ -426,7 +595,10 @@ SplitCells <- function(object = mouse_eyes, split.by = "conditions"){
 
 
 SplitTSNEPlot <- function(object = mouse_eyes, split.by = "conditions",
-                          range = NULL, return.data = FALSE){
+                          range = NULL, return.data = FALSE,
+                          do.label = T, group.by = "ident", 
+                          do.return = TRUE, no.legend = TRUE,
+                          pt.size = 1,label.size = 5 ){
     "
     split seurat object by certein criteria, and generate TSNE plot
     
@@ -448,9 +620,9 @@ SplitTSNEPlot <- function(object = mouse_eyes, split.by = "conditions",
     if(is.null(range)) range <- length(conditions)
     for(i in 1:range){ 
         p[[i]] <- TSNEPlot(object = object.subsets[[i]],
-                           do.label = T, group.by = "ident", 
-                           do.return = TRUE, no.legend = TRUE,
-                           pt.size = 1,label.size = 5 )+
+                           do.label = do.label, group.by = group.by, 
+                           do.return = do.return, no.legend = no.legend,
+                           pt.size = pt.size,label.size = label.size )+
             ggtitle(conditions[i])+
             theme(text = element_text(size=20),     #larger text including legend title							
                   plot.title = element_text(hjust = 0.5)) #title in middle
@@ -458,6 +630,7 @@ SplitTSNEPlot <- function(object = mouse_eyes, split.by = "conditions",
     print(do.call(plot_grid, p))
     if(return.data) return(object.subsets)
 }
+
 
 TSNEPlot.3D <- function (object, reduction.use = "tsne", dim.1 = 1, dim.2 = 2, dim.3 = 3,
           cells.use = NULL, pt.size = 1, do.return = FALSE, do.bare = FALSE, 

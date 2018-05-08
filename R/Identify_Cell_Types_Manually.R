@@ -27,7 +27,7 @@ Myeloid <-  MouseGenes(mouse_eyes,c("PPBP","GNG11","HBA2","HBB","Cma1","Mcpt4","
 Lymphoid <- MouseGenes(mouse_eyes,c("CD3G","CD3D","CD2","Cd19","CD79A","MS4A1",
                                      "GNLY","Ncr1","CCL5","KLRD1","NKG7"))
 Melanocytes <- MouseGenes(mouse_eyes,c("Pmel","Mlana"))
-Mesenchymal <- MouseGenes(mouse_eyes,c("Pdgfrb","Vim","Has2","Dcn"))
+Mesenchymal <- MouseGenes(mouse_eyes,c("Pdgfrb","Has2","Dcn"))
 Myelinating_Schwann_cells <- MouseGenes(mouse_eyes,c("MBP","MPZ"))
 Pericytes <- MouseGenes(mouse_eyes,c("Pdgfrb","Cspg4","Anpep","Rgs5",
                                       "Myh11","Mylk","Des","Vtn","Ifitm1"))
@@ -52,9 +52,8 @@ Featureplot(Stem_cell)
 Featureplot(Stromal_fibroblasts)
 Featureplot(Neurons)
 
-markers.to.plot <- c(Hematopoietic[1:2], Lymphoid[1:2],Myeloid[c(7,9)],
-                     Endothelium[c(1:3,5,7)], Myelinating_Schwann_cells,Melanocytes,
-                     RPE,Mesenchymal[c(1,4)],Pericytes[c(4,6:7)],
+markers.to.plot <- c(Melanocytes,Myelinating_Schwann_cells,Endothelium[c(1:3,5,7)],
+                     Hematopoietic[1:2],Pericytes[c(4,6:7)],Mesenchymal[c(1,3)],RPE,
                      Smooth_muscle_cells)
 markers.to.plot <- unique(markers.to.plot)
 DotPlot(mouse_eyes, genes.plot = rev(markers.to.plot),
@@ -65,45 +64,19 @@ DotPlot(mouse_eyes, genes.plot = rev(markers.to.plot),
 table(mouse_eyes@ident)
 idents <- as.data.frame(table(mouse_eyes@ident))
 old.ident.ids <- idents$Var1
-new.cluster.ids <- c("RPE 0",
-                     "Mesenchymal cells 1",
+new.cluster.ids <- c("Pericytes 0",
+                     "Pericytes 1",
                      "Endothelial cells 2",
-                     "Endothelial cells 3",
-                     "Pericytes 4",
-                     "Smooth muscle cells 5",
-                     "Mesenchymal cells 6",
-                     "Monocytes 7",
-                     "RPE 8",
+                     "Smooth muscle cells 3",
+                     "RPE 4",
+                     "Endothelial cells 5",
+                     "Pericytes 6",
+                     "Pericytes 7",
+                     "Hematopoietic cells 8",
                      "Schwann cells 9",
                      "Endothelial cells 10",
-                     "Monocytes 11",
-                     "T cells 12")
-
-mouse_eyes@ident <- plyr::mapvalues(x = mouse_eyes@ident,
-                                    from = old.ident.ids,
-                                    to = new.cluster.ids)
-DotPlot(mouse_eyes, genes.plot = rev(markers.to.plot),
-        cols.use = c("blue","red"), x.lab.rot = T, plot.legend = T,
-        dot.scale = 8, do.return = T)
-# mouse_eyes <- RenameIdentBack(mouse_eyes)
-
-#====== 2.2 Plots ==========================================
-lnames = load(file = "./data/mouse_eyes_alignment.Rda")
-lnames
-table(mouse_eyes@ident)
-new.cluster.ids <- c("Retinal Pigment Epithelium",
-                     "Mesenchymal cells",
-                     "Endothelial cells",
-                     "Endothelial cells",
-                     "Pericytes",
-                     "Smooth\n muscle cells",
-                     "Mesenchymal cells",
-                     "Monocytes",
-                     "Retinal Pigment Epithelium",
-                     "Schwann cells",
-                     "Endothelial cells",
-                     "Monocytes",
-                     "T cells")
+                     "Schwann cells 11",
+                     "Melanocytes 12")
 
 mouse_eyes@ident <- plyr::mapvalues(x = mouse_eyes@ident,
                                     from = old.ident.ids,
@@ -111,19 +84,75 @@ mouse_eyes@ident <- plyr::mapvalues(x = mouse_eyes@ident,
 DotPlot(mouse_eyes, genes.plot = rev(markers.to.plot),
         cols.use = c("blue","red"), x.lab.rot = T, plot.legend = F,
         dot.scale = 8, do.return = T)
+# mouse_eyes <- RenameIdentBack(mouse_eyes)
 
+#====== 2.2 dot Plots ==========================================
+lnames = load(file = "./data/mouse_eyes_alignment.Rda")
+lnames
+table(mouse_eyes@ident)
+idents <- as.data.frame(table(mouse_eyes@ident))
+old.ident.ids <- idents$Var1
+new.cluster.ids <- c("Pericytes",
+                     "Pericytes",
+                     "Endothelial cells",
+                     "Smooth muscle cells",
+                     "Retinal pigment epithelium",
+                     "Endothelial cells",
+                     "Pericytes",
+                     "Pericytes",
+                     "Hematopoietic cells",
+                     "Schwann cells",
+                     "Endothelial cells",
+                     "Schwann cells",
+                     "Melanocytes")
+
+mouse_eyes@ident <- plyr::mapvalues(x = mouse_eyes@ident,
+                                    from = old.ident.ids,
+                                    to = new.cluster.ids)
+markers.to.plot <- c(Melanocytes,Myelinating_Schwann_cells,Hematopoietic[1:2],
+                     RPE,Smooth_muscle_cells,Endothelium[c(1:3,5,7)],
+                     Pericytes[c(4,6:7)],Mesenchymal[c(1,3)])
+markers.to.plot <- unique(markers.to.plot)
+DotPlot(mouse_eyes, genes.plot = rev(markers.to.plot),
+        cols.use = c("blue","red"), x.lab.rot = T, plot.legend = F,
+        dot.scale = 8, do.return = T)
+
+#=====2.3 tsne plot=============================
+lnames = load(file = "./data/mouse_eyes_alignment.Rda")
+lnames
+table(mouse_eyes@ident)
+idents <- as.data.frame(table(mouse_eyes@ident))
+old.ident.ids <- idents$Var1
+new.cluster.ids <- c("0) Pericytes",
+                     "1) Pericytes",
+                     "2) Endothelial cells",
+                     "3) Smooth muscle cells",
+                     "4) Retinal pigment epithelium",
+                     "5) Endothelial cells",
+                     "6) Pericytes",
+                     "7) Pericytes",
+                     "8) Hematopoietic cells",
+                     "9) Myelinating schwann cells",
+                     "10) Endothelial cells",
+                     "11) Myelinating schwann cells",
+                     "12) Melanocytes")
+
+mouse_eyes@ident <- plyr::mapvalues(x = mouse_eyes@ident,
+                                    from = old.ident.ids,
+                                    to = new.cluster.ids)
 TSNEPlot(object = mouse_eyes, no.legend = TRUE, do.label = TRUE,
-         do.return = TRUE, label.size = 6)+
+         do.return = TRUE, label.size = 5)+
   ggtitle("TSNE plot of major cell types")+
   theme(text = element_text(size=20),     #larger text including legend title							
         plot.title = element_text(hjust = 0.5)) #title in middle
 freq_table <- prop.table(x = table(mouse_eyes@ident, mouse_eyes@meta.data[, "conditions"]), 
                          margin = 2)
 barplot(height = freq_table)
-
 freq_table
+table(mouse_eyes@meta.data[, "conditions"])
 
 #====== 2.3 Compare cell type changes across conditions  ==========================================
 # the two patients profiled have very different composition
 # Compare clusters for each dataset
-SplitTSNEPlot(mouse_eyes, "conditions")
+SplitTSNEPlot(mouse_eyes, "conditions",do.label = F, 
+              do.return = TRUE, no.legend = T )

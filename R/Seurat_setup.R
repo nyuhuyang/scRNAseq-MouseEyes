@@ -18,6 +18,7 @@ source("./R/Seurat_functions.R")
 # setup Seurat objects since both count matrices have already filtered
 # cells, we do no additional filtering here
 mouse_eyes_raw <- list()
+mouse_eyes_Seurat <- list()
 protocols <- c("129_B6","B6")
 projects <- c("EC-IB-4698","EC-IB-4698")
 conditions <- c("129_B6", "B6")
@@ -26,13 +27,13 @@ for(i in 1:length(protocols)){
                                                      protocols[i],"/outs/filtered_gene_bc_matrices/mm10/"))
     colnames(mouse_eyes_raw[[i]]) <- paste0(conditions[i],
                                             "_",colnames(mouse_eyes_raw[[i]]))
+    mouse_eyes_Seurat[[i]] <- CreateSeuratObject(mouse_eyes_raw[[i]],
+                                              min.cells = 3,
+                                              min.genes = 200,
+                                              project = projects[i],
+                                              names.delim = "_")
+    mouse_eyes_Seurat[[i]]@meta.data$conditions <- conditions[i]
 }
-mouse_eyes_Seurat <- lapply(mouse_eyes_raw, CreateSeuratObject,
-                            min.cells = 3,
-                            min.genes = 200,
-                            names.delim = "_",
-                            project = projects)
-for(i in 1:length(protocols)) mouse_eyes_Seurat[[i]]@meta.data$conditions <- conditions[i]
 mouse_eyes_Seurat <- lapply(mouse_eyes_Seurat, FilterCells, 
                             subset.names = "nGene", 
                             low.thresholds = 200, 
@@ -57,7 +58,7 @@ length(genes.use) # 1/10 of total sample size 11212
 mouse_eyes <- RunCCA(mouse_eyes_Seurat[[1]],mouse_eyes_Seurat[[2]],
                      genes.use = genes.use,
                      num.cc = 30)
-save(mouse_eyes, file = "./data/mouse_eyes_alignment.Rda")
+#save(mouse_eyes, file = "./data/mouse_eyes_alignment.Rda")
 
 # CCA plot CC1 versus CC2 and look at a violin plot
 p1 <- DimPlot(object = mouse_eyes, reduction.use = "cca", group.by = "conditions", 
@@ -105,10 +106,10 @@ VlnPlot(object = mouse_eyes, features.plot = c("nGene", "nUMI", "percent.mito"),
 
 par(mfrow = c(1, 2))
 GenePlot(object = mouse_eyes, gene1 = "nUMI", gene2 = "percent.mito")
-GenePlot(object = mouse_eyes, gene1 = "nUMI", gene2 = "nGene",log="xy")
+GenePlot(object = mouse_eyes, gene1 = "nUMI", gene2 = "nGene")
 
 mouse_eyes <- FilterCells(object = mouse_eyes, subset.names = c("nGene", "percent.mito"), 
-                          low.thresholds = c(600, -Inf), high.thresholds = c(6000, 0.2))
+                          low.thresholds = c(600, -Inf), high.thresholds = c(5000, 0.10))
 
 #Now, we annotate the clusters as before based on canonical markers.
 #png('./output/TSNEPlot.png')

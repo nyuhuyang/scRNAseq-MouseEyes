@@ -14,7 +14,7 @@ Chromium single-cell RNA-seq outputs were processed by Cell Ranger analysis pipe
 
 #### Software Setup
 R version 3.4.3 http://cran.us.r-project.org/bin/macosx/R-3.4.3.pkg <br />
-dplyr_0.7.4 (Did't test other versions)<br />
+dplyr_0.7.4 <br />
 Seurat_2.1.0 https://cran.r-project.org/src/contrib/Archive/Seurat/Seurat_2.1.0.tar.gz (other Seurat versions will generate slightly different results )<br />
 
 After pulling this repository, create folders **_data_** and **_output_** in the top working folder.
@@ -152,3 +152,57 @@ Below is a example of `./output/Myeloid.cells_young_vs_aged.csv` file with first
 Cluster indicates the original cluster 9 in `./data/mouse_eyes_alignment.Rda`, young vs. aged.<br />
 Only RPE (Retinal Pigment Epithelium) is further subjected to a second round of unsupervised analysis following the same approach, resulting in 3 subclusters a tSNE analysis with ~0.05 resolution.
 
+##  
+sessionInfo()
+R version 3.4.4 (2018-03-15)
+Platform: x86_64-apple-darwin15.6.0 (64-bit)
+Running under: macOS High Sierra 10.13.4
+
+Matrix products: default
+BLAS: /System/Library/Frameworks/Accelerate.framework/Versions/A/Frameworks/vecLib.framework/Versions/A/libBLAS.dylib
+LAPACK: /Library/Frameworks/R.framework/Versions/3.4/Resources/lib/libRlapack.dylib
+
+locale:
+[1] en_US.UTF-8/en_US.UTF-8/en_US.UTF-8/C/en_US.UTF-8/en_US.UTF-8
+
+attached base packages:
+[1] parallel  stats     graphics  grDevices utils     datasets  methods   base     
+
+other attached packages:
+[1] dplyr_0.7.4         Seurat_2.1.0        Biobase_2.38.0      BiocGenerics_0.24.0
+[5] Matrix_1.2-14       cowplot_0.9.2       ggplot2_2.2.1      
+
+loaded via a namespace (and not attached):
+  [1] diffusionMap_1.1-0   Rtsne_0.14           VGAM_1.0-5           colorspace_1.3-2    
+  [5] ggridges_0.5.0       class_7.3-14         modeltools_0.2-21    mclust_5.4          
+  [9] htmlTable_1.11.2     base64enc_0.1-3      proxy_0.4-22         rstudioapi_0.7      
+ [13] DRR_0.0.3            flexmix_2.3-14       lubridate_1.7.4      prodlim_2018.04.18  
+ [17] mvtnorm_1.0-7        ranger_0.9.0         codetools_0.2-15     splines_3.4.4       
+ [21] R.methodsS3_1.7.1    mnormt_1.5-5         doParallel_1.0.11    robustbase_0.93-0   
+ [25] knitr_1.20           tclust_1.3-1         RcppRoll_0.2.2       Formula_1.2-2       
+ [29] caret_6.0-79         ica_1.0-1            broom_0.4.4          gridBase_0.4-7      
+ [33] ddalpha_1.3.3        cluster_2.0.7-1      kernlab_0.9-26       R.oo_1.22.0         
+ [37] sfsmisc_1.1-2        compiler_3.4.4       backports_1.1.2      assertthat_0.2.0    
+ [41] lazyeval_0.2.1       lars_1.2             acepack_1.4.1        htmltools_0.3.6     
+ [45] tools_3.4.4          bindrcpp_0.2.2       igraph_1.1.0         gtable_0.2.0        
+ [49] glue_1.2.0           reshape2_1.4.3       Rcpp_0.12.16         NMF_0.21.0          
+ [53] trimcluster_0.1-2    gdata_2.18.0         ape_5.1              nlme_3.1-137        
+ [57] iterators_1.0.9      fpc_2.1-11           psych_1.8.3.3        timeDate_3043.102   
+ [61] gower_0.1.2          stringr_1.3.0        irlba_2.3.2          rngtools_1.2.4      
+ [65] gtools_3.5.0         DEoptimR_1.0-8       MASS_7.3-50          scales_0.5.0        
+ [69] ipred_0.9-6          RColorBrewer_1.1-2   yaml_2.1.19          pbapply_1.3-4       
+ [73] gridExtra_2.3        pkgmaker_0.22        segmented_0.5-3.0    rpart_4.1-13        
+ [77] latticeExtra_0.6-28  stringi_1.1.7        foreach_1.4.4        checkmate_1.8.5     
+ [81] caTools_1.17.1       ggjoy_0.4.0          lava_1.6.1           geometry_0.3-6      
+ [85] dtw_1.18-1           SDMTools_1.1-221     rlang_0.2.0          pkgconfig_2.0.1     
+ [89] prabclus_2.2-6       bitops_1.0-6         lattice_0.20-35      ROCR_1.0-7          
+ [93] purrr_0.2.4          bindr_0.1.1          recipes_0.1.2        htmlwidgets_1.2     
+ [97] tidyselect_0.2.4     CVST_0.2-1           plyr_1.8.4           magrittr_1.5        
+[101] R6_2.2.2             gplots_3.0.1         Hmisc_4.1-1          dimRed_0.1.0        
+[105] sn_1.5-2             withr_2.1.2          pillar_1.2.2         foreign_0.8-70      
+[109] mixtools_1.1.0       survival_2.42-3      scatterplot3d_0.3-41 abind_1.4-5         
+[113] nnet_7.3-12          tsne_0.1-3           tibble_1.4.2         KernSmooth_2.23-15  
+[117] grid_3.4.4           data.table_1.10.4-3  FNN_1.1              ModelMetrics_1.1.0  
+[121] digest_0.6.15        diptest_0.75-7       xtable_1.8-2         numDeriv_2016.8-1
+[125] tidyr_0.8.0          R.utils_2.6.0        stats4_3.4.4         munsell_0.4.3    
+[129] registry_0.5         magic_1.5-8  
