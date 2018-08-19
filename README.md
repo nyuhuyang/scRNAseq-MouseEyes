@@ -9,38 +9,69 @@ Chromium single-cell RNA-seq outputs were processed by Cell Ranger analysis pipe
 ## How to use this repository
 
 #### Software Setup
-R version 3.4.3 http://cran.us.r-project.org/bin/macosx/R-3.4.3.pkg <br />
-dplyr_0.7.4 <br />
-Seurat_2.1.0 https://cran.r-project.org/src/contrib/Archive/Seurat/Seurat_2.1.0.tar.gz (other Seurat versions will generate slightly different results )<br />
+R version 3.4.3 http://cran.us.r-project.org/bin/macosx/R-3.4.3.pkg <br>
+dplyr_0.7.4 <br>
+Seurat_2.1.0 https://cran.r-project.org/src/contrib/Archive/Seurat/Seurat_2.1.0.tar.gz (other Seurat versions will generate slightly different results )<br>
 
 After pulling this repository, create folders **_data_** and **_output_** in the top working folder.
 Move Cell Ranger analysis results into **_data_** folder.
 
-### 1. Seurat_setup.R
+Tree structure of directory:
+<pre>
+ |── LICENSE.md<br>
+|── R<br>
+|  |── Differential_analysis.R<br>
+|  |── Identify_Cell_Types_Manually.R<br>
+|  |── Seurat_functions.R<br>
+|  └── Seurat_setup.R<br>
+|── README.md<br>
+|── data<br>
+|  |── 129_B6<br>
+|  |  └── outs<br>
+|  |      |── filtered_gene_bc_matrices<br>
+|  |      |  └── mm10<br>
+|  |      |      |── barcodes.tsv<br>
+|  |      |      |── genes.tsv<br>
+|  |      |      └── matrix.mtx<br>
+|  |── B6<br>
+|  |  └── outs<br>
+|  |      |── filtered_gene_bc_matrices<br>
+|  |      |  └── mm10<br>
+|  |      |      |── barcodes.tsv<br>
+|  |      |      |── genes.tsv<br>
+|  |      |      └── matrix.mtx<br>
+|── doc<br>
+|── output<br>
+└── scRNAseq-MouseEyes.Rproj<br>
+
+### 1. Seurat_setup
+<a href="https://github.com/nyuhuyang/scRNAseq-MouseEyes/blob/master/R/Seurat_setup.R">Seurat_setup.R</a></li>
 Unsupervised cell clustering analysis was carried out using the Seurat 2.2 R package. Cells with <500 genes and genes detected within <3 cells were excluded from the analysis. Gene expression raw counts were normalized following a global-scaling normalization method with a scale factor of 10,000 and a log transformation, using the Seurat NormalizeData function. The top 1000 highly variable genes from young C57BL/6J and aged C57BL/6J datasets were selected, followed by canonical correlation analysis (CCA) to identify common sources of variation between the two datasets and minimize the batch effect. The first 20 CCA results were chosen for principal component analysis (PCA). Cells were used for 2-dimensional t-Distributed Stochastic Neighbor Embedding (tSNE) (ref van der maaten and hinton 2008) with 0.8 resolution.
 
  After running this script, a `mouse_eyes_alignment.Rda` file will be generated inside **_data_** folder.
  Do not modify any files in **_data_** folder.
  
  
-### 2. Identify_Cell_Types_Manually.R
+### 2. Identify_Cell_Types_Manually
+<a href="https://github.com/nyuhuyang/scRNAseq-MouseEyes/blob/master/R/Identify_Cell_Types_Manually.R">Identify_Cell_Types_Manually.R</a></li>
 All clusters are examed against 122(number may change) CD marker genes.
 All cell types are predicted by at least two marker genes with the adjusted p-value(FDR) smaller than 10^-30.
 
-Endothelial cells were identified by Cdh5, Flt1, Kdr, Pecam1, Plvap, Ptprb, and Vwf.<br />
-Pericytes were identified by Dcn, Des, Mylk, Pdgfrb, and Rgs5.<br />
-Hematopoietic cells were identified by Laptm5 and Ptprc.<br />
-Melanocytes were identified by Mlana and Pmel.<br />
-Myelinating Schwann cells were identified by Mbp and Mpz.<br />
-Retinal pigment epitheliums were identified by Rlbp1 and Rpe65.<br />
+Endothelial cells were identified by Cdh5, Flt1, Kdr, Pecam1, Plvap, Ptprb, and Vwf.<br>
+Pericytes were identified by Dcn, Des, Mylk, Pdgfrb, and Rgs5.<br>
+Hematopoietic cells were identified by Laptm5 and Ptprc.<br>
+Melanocytes were identified by Mlana and Pmel.<br>
+Myelinating Schwann cells were identified by Mbp and Mpz.<br>
+Retinal pigment epitheliums were identified by Rlbp1 and Rpe65.<br>
 
 `DotPlot` is implemented for visualizing differential expressed marker genes.
 Multiple plots and table will be generated, save them if you want. I prefer to keep the original identity of `mouse_eyes_alignment.Rda` intact for further downstream analysis.
 
-### 3. Differential_analysis.R
-Modified FindAllMarkers() `FindAllMarkers.UMI()` will generate similar dataframe plus two extra columns `pct.1_UMI` and `pct.2_UMI` to record nUMI. `pct.1_UMI` is nUMI of current cluster, `pct.2_UMI` is average nUMI of rest of clusters.<br />
-`FindAllMarkers(object, test.use = "bimod")` : Likelihood-ratio test for single cell gene expression, (McDavid et al., Bioinformatics, 2013)<br />
-`p.adjust(p, method = "BH")`:Benjamini & Hochberg (1995) ("BH" or its alias "fdr").<br />
+### 3. Differential_analysis
+<a href="https://github.com/nyuhuyang/scRNAseq-MouseEyes/blob/master/R/Differential_analysis.R">Differential_analysis.R</a></li>
+Modified FindAllMarkers() `FindAllMarkers.UMI()` will generate similar dataframe plus two extra columns `pct.1_UMI` and `pct.2_UMI` to record nUMI. `pct.1_UMI` is nUMI of current cluster, `pct.2_UMI` is average nUMI of rest of clusters.<br>
+`FindAllMarkers(object, test.use = "bimod")` : Likelihood-ratio test for single cell gene expression, (McDavid et al., Bioinformatics, 2013)<br>
+`p.adjust(p, method = "BH")`:Benjamini & Hochberg (1995) ("BH" or its alias "fdr").<br>
 
 #### 3.1 Compare differential exression across all clusters, generate CSV files
 Generate CSV file in **_output_** folder.
@@ -64,15 +95,15 @@ Below is a example of `./output/129_B6.csv` file with first 6 rows.
 
 The results data frame has the following columns :
 
-p_val: p_val (unadjusted) is calculated using likelihood-ratio test for single-cell gene expression, (McDavid et al., Bioinformatics, 2013) <br />
-avg_logFC: log fold-change of the average expression between the two groups. Positive values indicate that the gene is more highly expressed in the first group.<br />
-pct.1: The percentage of cells where the gene is detected in the first group.<br />
-pct.2: The percentage of cells where the gene is detected in the second group.<br />
-p_val_adj: Adjusted p-value, based on Benjamini & Hochberg (1995) ("BH" or its alias "fdr")<br />
+p_val: p_val (unadjusted) is calculated using likelihood-ratio test for single-cell gene expression, (McDavid et al., Bioinformatics, 2013) <br>
+avg_logFC: log fold-change of the average expression between the two groups. Positive values indicate that the gene is more highly expressed in the first group.<br>
+pct.1: The percentage of cells where the gene is detected in the first group.<br>
+pct.2: The percentage of cells where the gene is detected in the second group.<br>
+p_val_adj: Adjusted p-value, based on Benjamini & Hochberg (1995) ("BH" or its alias "fdr")<br>
 pct.1_UMI is nUMI of the current cluster.
-pct.2_UMI is average nUMI of rest of clusters.<br />
+pct.2_UMI is average nUMI of rest of clusters.<br>
 cluster : either cell types or original clusters in `./data/mouse_eyes_alignment.Rda`.
-row.name and gene column are identical.<br />
+row.name and gene column are identical.<br>
 
 ##  
 sessionInfo()

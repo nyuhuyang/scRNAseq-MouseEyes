@@ -352,7 +352,43 @@ FindAllMarkersbyAge<- function(object, genes.use = NULL, logfc.threshold = -Inf,
         return(gde.all)
 }
 
-
+##
+gg_colors <- function(object = mouse_eyes, cells.use = NULL, no.legend = TRUE, do.label = TRUE,
+                      do.return = TRUE, label.size = 6, gg_title=""){
+        "
+        Extract ColorHexa from Seurat TSNE plot
+        
+        Inputs
+        -------------------
+        object: aligned seurat object with ident
+        cells.use: only return ColorHexa of selected cells
+        other TSNEPlot inputs 
+        
+        Outputs
+        --------------------
+        colors: color vector named by cell ID
+        "
+        g1 <- Seurat::TSNEPlot(object = object, no.legend = no.legend,
+                               do.label = do.label,do.return = do.return,
+                               label.size = label.size)+
+                ggtitle(gg_title)+
+                theme(text = element_text(size=15),     #larger text including legend title							
+                      plot.title = element_text(hjust = 0.5)) #title in middle
+        print(g1)
+        g <- ggplot2::ggplot_build(g1)
+#        print(unique(g$data[[1]]["colour"]))
+        colors <- unlist(g$data[[1]]["colour"])
+        
+        #select color by cells ID
+        cells <- Seurat::WhichCells(object)
+        names(colors) <- cells
+        if(!is.null(cells.use)) colors <- colors[cells.use]
+        
+        colors <- as.data.frame(table(colors))
+        colors <- colors$colors
+        print(colors)
+        return(as.character(colors))
+}
 
 # modified GenePlot
 # GenePlot.1(do.hover = TRUE) will return ggplot 
@@ -595,10 +631,9 @@ SplitCells <- function(object = mouse_eyes, split.by = "conditions"){
 
 
 SplitTSNEPlot <- function(object = mouse_eyes, split.by = "conditions",
-                          range = NULL, return.data = FALSE,
-                          do.label = T, group.by = "ident", 
-                          do.return = TRUE, no.legend = TRUE,
-                          pt.size = 1,label.size = 5 ){
+                          select.plots = NULL, return.plots = FALSE,
+                          do.label = T, group.by = "ident", no.legend = TRUE,
+                          pt.size = 1,label.size = 5,... ){
     "
     split seurat object by certein criteria, and generate TSNE plot
     
@@ -617,18 +652,18 @@ SplitTSNEPlot <- function(object = mouse_eyes, split.by = "conditions",
     conditions <- object.subsets[[length(object.subsets)]] # levels of conditions
     
     p <- list()
-    if(is.null(range)) range <- length(conditions)
-    for(i in 1:range){ 
+    if(is.null(range)) select.plots <- 1:length(conditions)
+    for(i in select.plots){ 
         p[[i]] <- TSNEPlot(object = object.subsets[[i]],
                            do.label = do.label, group.by = group.by, 
-                           do.return = do.return, no.legend = no.legend,
-                           pt.size = pt.size,label.size = label.size )+
+                           do.return = T, no.legend = no.legend,
+                           pt.size = pt.size,label.size = label.size,...)+
             ggtitle(conditions[i])+
             theme(text = element_text(size=20),     #larger text including legend title							
                   plot.title = element_text(hjust = 0.5)) #title in middle
     }
-    print(do.call(plot_grid, p))
-    if(return.data) return(object.subsets)
+    p <- p[lapply(p,length)>0] # remove NULL element
+    if(return.plots) return(p) else print(do.call(plot_grid, p))
 }
 
 
