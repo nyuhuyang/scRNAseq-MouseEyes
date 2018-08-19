@@ -1,4 +1,3 @@
-# scRNAseq-MouseEyes
 # Single cell transcriptomics identifies a Hedgehog-mediated immunomodulatory signaling circuit in the eye choroid
 
 ## SUMMARY
