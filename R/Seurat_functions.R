@@ -1,5 +1,8 @@
-# combine FindAllMarkers and calculate average UMI
-
+#' Combine FindAllMarkers and calculate average UMI
+#' Modified Seurat::FindAllMarkers function to add average UMI for group1 (UMI.1) and group 2 (UMI.2)
+#' @param ... all paramethers are the same as Seurat::FindAllMarkers
+#' @export to.return data frame
+#' @example FindAllMarkers.UMI(mouse_eyes)
 FindAllMarkers.UMI <- function (object, genes.use = NULL, logfc.threshold = 0.25, 
           test.use = "bimod", min.pct = 0.1, min.diff.pct = -Inf, 
           print.bar = TRUE, only.pos = FALSE, max.cells.per.ident = Inf, 
@@ -73,6 +76,9 @@ FindAllMarkers.UMI <- function (object, genes.use = NULL, logfc.threshold = 0.25
 }
 
 
+# Modified p_val_adj to method = "BH"
+#' @param ... all paramethers are the same as Seurat::FindMarkers
+#' @export gde.all data frame
 FindMarkers.1 <- function (object, ident.1, ident.2 = NULL, genes.use = NULL, 
           logfc.threshold = 0.25, test.use = "wilcox", min.pct = 0.1, 
           min.diff.pct = -Inf, print.bar = TRUE, only.pos = FALSE, 
@@ -242,43 +248,14 @@ FindMarkers.1 <- function (object, ident.1, ident.2 = NULL, genes.use = NULL,
         return(to.return)
 }
 
-# find and print differentially expressed genes within all major cell types ================
-# combine SubsetData, FindAllMarkers, write.csv parallely
 
-SplitFindAllMarkers <- function(object,split.by = "conditions", write.csv = TRUE){
-    "
-    split seurat object by certein criteria, and find all markers+ UMI +adj_p
-    
-    Inputs
-    -------------------
-    object: aligned seurat object with labels at object@meta.data$
-    split.by: the criteria to split
-    write.csv: TRUE/FASLE, write csv files or not.
-    
-    Outputs
-    --------------------
-    object.markers: list of gene markers
-    "
-    object.subsets <- SplitCells(object = object, split.by = split.by)
-    conditions <- object.subsets[[length(object.subsets)]] # levels of conditions
-    
-    object.markers <- list()
-
-    for(i in 1:length(conditions)){ 
-        object.markers[[i]] <- FindAllMarkers.UMI(object = object.subsets[[i]],
-                                         logfc.threshold = -Inf,
-                                         return.thresh = 1,
-                                         test.use = "bimod",
-                                         min.pct = -Inf,
-                                         min.diff.pct = -Inf,
-                                         min.cells = -Inf)
-        if(write.csv) write.csv(object.markers[[i]], 
-                                file=paste0("./output/",
-                                            deparse(substitute(object)), 
-                                            "_",conditions[i],
-                                            ".csv"))
-    }
-    return(object.markers)
+#=====Clean memory======================
+# extract from WCGNA
+GC <- function()
+{
+        while (gc()[2, 4] != gc()[2, 4] | gc()[1, 4] != gc()[1,
+                                                             4]) {
+        }
 }
 
 
@@ -291,7 +268,7 @@ FindAllMarkersbyAge<- function(object, genes.use = NULL, logfc.threshold = -Inf,
                               min.cells = -Inf, latent.vars = "nUMI", assay.type = "RNA", 
                               ...) 
 {   
-        cells <- FetchData(object,"conditions")
+        cells <- FetchData(object, vars.all = "conditions")
         cells$ident <- object@ident
         cells$new.ident <- paste0(cells$ident,"_",cells$conditions)
         object <- SetIdent(object, cells.use = rownames(cells),
@@ -352,25 +329,19 @@ FindAllMarkersbyAge<- function(object, genes.use = NULL, logfc.threshold = -Inf,
         return(gde.all)
 }
 
-##
+
+#' Extract ColorHexa from Seurat TSNE plot
+#' @param object Seurat object
+#' @param cells.use only return ColorHexa of selected cells
+#' @param ... all paramethers are the same as Seurat::FindAllMarkers
+#' @export colors color vector named by cell ID
+#' @example gg_colors(mouse_eyes, cells.use = "129_B6_AAACCTGCATGGTCTA")
 gg_colors <- function(object = mouse_eyes, cells.use = NULL, no.legend = TRUE, do.label = TRUE,
-                      do.return = TRUE, label.size = 6, gg_title=""){
-        "
-        Extract ColorHexa from Seurat TSNE plot
-        
-        Inputs
-        -------------------
-        object: aligned seurat object with ident
-        cells.use: only return ColorHexa of selected cells
-        other TSNEPlot inputs 
-        
-        Outputs
-        --------------------
-        colors: color vector named by cell ID
-        "
+                      do.return = FALSE, label.size = 6, gg_title="",...){
+
         g1 <- Seurat::TSNEPlot(object = object, no.legend = no.legend,
                                do.label = do.label,do.return = do.return,
-                               label.size = label.size)+
+                               label.size = label.size,...)+
                 ggtitle(gg_title)+
                 theme(text = element_text(size=15),     #larger text including legend title							
                       plot.title = element_text(hjust = 0.5)) #title in middle
@@ -390,63 +361,6 @@ gg_colors <- function(object = mouse_eyes, cells.use = NULL, no.legend = TRUE, d
         return(as.character(colors))
 }
 
-# modified GenePlot
-# GenePlot.1(do.hover = TRUE) will return ggplot 
-GenePlot.1 <- function (object, gene1, gene2, cell.ids = NULL, col.use = NULL, 
-                        pch.use = 16, pt.size = 1.5, use.imputed = FALSE, use.scaled = FALSE, 
-                        use.raw = FALSE, do.hover = FALSE, data.hover = "ident", 
-                        do.identify = FALSE, dark.theme = FALSE, do.spline = FALSE, 
-                        spline.span = 0.75, ...) 
-{
-        cell.ids <- SetIfNull(x = cell.ids, default = object@cell.names)
-        data.use <- as.data.frame(x = FetchData(object = object, 
-                                                vars.all = c(gene1, gene2), cells.use = cell.ids, use.imputed = use.imputed, 
-                                                use.scaled = use.scaled, use.raw = use.raw))
-        data.plot <- data.use[cell.ids, c(gene1, gene2)]
-        names(x = data.plot) <- c("x", "y")
-        ident.use <- as.factor(x = object@ident[cell.ids])
-        if (length(x = col.use) > 1) {
-                col.use <- col.use[as.numeric(x = ident.use)]
-        }
-        else {
-                col.use <- SetIfNull(x = col.use, default = as.numeric(x = ident.use))
-        }
-        gene.cor <- round(x = cor(x = data.plot$x, y = data.plot$y), 
-                          digits = 2)
-        if (dark.theme) {
-                par(bg = "black")
-                col.use <- sapply(X = col.use, FUN = function(color) ifelse(test = all(col2rgb(color) == 
-                                                                                               0), yes = "white", no = color))
-                axes = FALSE
-                col.lab = "white"
-        }
-        else {
-                axes = TRUE
-                col.lab = "black"
-        }
-        
-        if (dark.theme) {
-                axis(side = 1, at = NULL, labels = TRUE, col.axis = col.lab, 
-                     col = col.lab)
-                axis(side = 2, at = NULL, labels = TRUE, col.axis = col.lab, 
-                     col = col.lab)
-        }
-        if (do.spline) {
-                spline.fit <- smooth.spline(x = data.plot$x, y = data.plot$y, 
-                                            df = 4)
-                loess.fit <- loess(formula = y ~ x, data = data.plot, 
-                                   span = spline.span)
-                points(x = data.plot$x, y = loess.fit$fitted, col = "darkblue")
-        }
-        if (do.identify | do.hover) {
-                p <- ggplot2::ggplot(data = data.plot, mapping = aes(x = x, 
-                                                                     y = y))
-                p <- p + geom_point(mapping = aes(x = x,y=y, color = col.use), size = pt.size, 
-                                    shape = pch.use )
-                p <- p + labs(title = gene.cor, x = gene1, y = gene2)
-                return(p)
-        }
-}
 
 LabelPoint <- function(plot, genes, exp.mat, adj.x.t = 0, adj.y.t = 0, adj.x.s = 0, 
                        adj.y.s = 0, text.size = 2.5, segment.size = 0.1) {
@@ -474,40 +388,36 @@ LabelUL <- function(plot, genes, exp.mat, adj.u.t = 0.1, adj.l.t = 0.15, adj.u.s
 }
 
 
-# MouseGenes
+# clean up the gene names for downstream analysis
 # turn list of gene character to uniform mouse gene list format
-MouseGenes <- function(seurat.object,marker.genes){
-        if(missing(seurat.object)) 
-          stop("A seurat object must be provided first")
-        if(class(seurat.object) != "seurat") 
-          stop("A seurat object must be provided first")
-        if(missing(marker.genes)) 
-          stop("A list of marker genes must be provided")
+#' @param object Seurat object
+#' @param marker.genes gene names, can be one gene or vector. Must be character
+#' @param unique TRUE/FALSE, output unique gene name or not
+#' @export marker.genes uniform mouse gene that exsit in object@data
+#' @example MouseGenes(mouse_eyes,c("Cdh5","Pecam1","Flt1"))
+MouseGenes <- function(object, marker.genes, unique =F){
         # marker.genes =c("Cdh5,Pecam1,Flt1,Vwf,Plvap,Kdr") for example
+        if(missing(object)) 
+                stop("A seurat object must be provided first!")
+        if(class(object) != "seurat") 
+                stop("A seurat object must be provided first!")
+        if(missing(marker.genes)) 
+                stop("A list of marker genes must be provided!")
+        if(object@var.genes[1]==toupper(object@var.genes[1]))
+                stop("This is human genome, use HumanGenes() instead!")
+        
         marker.genes <- as.character(marker.genes)
         marker.genes <- unlist(strsplit(marker.genes,","))
-        #        marker.genes <- unique(genes)
         marker.genes <- Hmisc::capitalize(tolower(marker.genes))
-        marker.genes <- marker.genes[marker.genes %in% seurat.object@raw.data@Dimnames[[1]]]
+        marker.genes <- CaseMatch(search = marker.genes, match = rownames(x = object@raw.data))
+        if(unique) marker.genes <- unique(marker.genes)
         print(length(marker.genes))
-        return(marker.genes)
+        return(as.character(marker.genes))
 }
 
-# rename ident back to 0,1,2,3...
-# convert character ident to numeric
-# RenameIdent function will generate error if new.cluster.ids overlap with old.ident.ids
-# so if want to rename ident smoothly, plyr::mapvalues is still better
-RenameIdentBack <- function(object){
-        old.ident.ids <- levels(object@ident)
-        old.ident.ids <- sort(old.ident.ids)
-        new.cluster.ids <- as.numeric(as.factor(old.ident.ids))
-        object@ident <- plyr::mapvalues(x = object@ident,
-                                        from = old.ident.ids,
-                                        to = new.cluster.ids)
-        return(object)
-}
 
-# FeaturePlot doesn't return ggplot
+# deprecated
+# FeaturePlot doesn't return ggplot (before Seurat_2.1.0, now it returns ggplot)
 # SingleFeaturePlot doesn't take seurat object as input
 # modified SingleFeaturePlot, take seurat object and return ggplot
 SingleFeaturePlot.1 <- function (object = object, feature = feature, pt.size = 1,
@@ -599,74 +509,121 @@ SingleFeaturePlot.1 <- function (object = object, feature = feature, pt.size = 1
         return(p)
 }
 
-SplitCells <- function(object = mouse_eyes, split.by = "conditions"){
-    "
-    split seurat object by certein criteria
-    
-    Inputs
-    -------------------
-    object: aligned seurat object with labels at object@meta.data$
-    split.by: the criteria to split
-    range: number of output plots, default is all of them.
-    return.data: TRUE/FASLE, return splited ojbect or not.
-    
-    Outputs
-    --------------------
-    object.subsets: list of subseted object by certein conditions,
-                    plus levels of the conditions
 
-    "
-    cell.all <- FetchData(object,split.by)
-    conditions <- levels(cell.all[,1])
-    cell.subsets <- lapply(conditions, function(x) 
-        rownames(cell.all)[cell.all$conditions == x])
-    
-    object.subsets <- list()
-    for(i in 1:length(conditions)){
-        object.subsets[[i]] <- SubsetData(object, cells.use =cell.subsets[[i]])
+#' Split seurat cell names by certein criteria
+#' A supporting funtion to SplitSeurat
+#' @param object Seurat object
+#' @param split.by the criteria to split, can be gene name, or any variable in meta.data
+#' @export cell.subsets list of subseted cell names by certein conditions, plus levels to split
+#' @example SplitCells(mouse_eyes, split.by = "conditions")
+SplitCells <- function(object = mouse_eyes, split.by = "conditions"){
+
+    cell.all <- FetchData(object = object, vars.all = split.by)
+    if(class(cell.all[,1]) == "numeric"){
+            Levels = paste(c("Express no","Express"), split.by)
+            cell.subsets[[1]] <- rownames(cell.all)[cell.all[,split.by] == 0]
+            cell.subsets[[2]] <- rownames(cell.all)[cell.all[,split.by] > 0]
+            cell.subsets[[3]] <- Levels # record conditions in the last return
     }
-    object.subsets[[i+1]] <- conditions # record conditions in the last return
-    return(object.subsets)
+    if(class(cell.all[,1]) == "factor"){
+            Levels <- levels(cell.all[,1])
+            cell.subsets <- lapply(Levels, function(x)
+                    rownames(cell.all)[cell.all[,split.by] == x])
+            cell.subsets[[length(cell.subsets)+1]] <- Levels # record conditions in the last return
+    }
+    return(cell.subsets)
 }
 
 
+# find and print differentially expressed genes within all major cell types
+# combine SubsetData, FindAllMarkers, write.csv
+#' @param object Seurat object
+#' @param split.by compatible to vars.all in Seurat::FetchData. If split.by is gene name,
+#' @param ... all paramethers are the same as Seurat::FindAllMarkers
+#' @export gde.all data frame
+#' @example FindAllMarkers.UMI(mouse_eyes)
+SplitFindAllMarkers <- function(object, split.by = "conditions", write.csv = TRUE,...){
+        
+        object.subsets <- SplitCells(object = object, split.by = split.by)
+        conditions <- object.subsets[[length(object.subsets)]] # levels of conditions
+        
+        object.markers <- list()
+        
+        for(i in 1:length(conditions)){ 
+                object.markers[[i]] <- FindAllMarkers.UMI(object = object.subsets[[i]],
+                                                          logfc.threshold = -Inf,
+                                                          return.thresh = 1,
+                                                          test.use = "bimod",
+                                                          min.pct = -Inf,
+                                                          min.diff.pct = -Inf,
+                                                          min.cells = -Inf,...)
+                if(write.csv) write.csv(object.markers[[i]], 
+                                        file=paste0("./output/",
+                                                    deparse(substitute(object)), 
+                                                    "_",conditions[i],
+                                                    ".csv"))
+        }
+        return(object.markers)
+}
+
+
+#' Split Seurat object by certein criteria
+#' A supporting funtion to SplitTSNEPlot
+#' @param object Seurat object
+#' @param split.by the criteria to split, can be gene name, or any variable in meta.data
+#' @export object.subsets list of subseted object by certein conditions,
+#' plus levels to be splited
+#' @example SplitCells(mouse_eyes, split.by = "conditions")
+SplitSeurat <- function(object = object, split.by = "conditions"){
+
+        cell.subsets <- SplitCells(object = object, split.by = split.by)
+        
+        object.subsets <- list()
+        for(i in 1:(length(cell.subsets)-1)){
+                object.subsets[[i]] <- SubsetData(object, cells.use =cell.subsets[[i]])
+        }
+        object.subsets[[i+1]] <- cell.subsets[[i+1]] # record conditions in the last return
+        return(object.subsets)
+}
+
+
+#' Split Seurat by certein criteria and make tsne plot
+#' @param object Seurat object
+#' @param split.by the criteria to split, can be gene name, or any variable in meta.data
+#' @param select.plots output order, default to NULL. If want to change,use c(2,1) for example
+#' @param return.data TRUE/FASLE, return splited ojbect or not.
+#' @param ... all other parameters are inherited from Seurat::TSNEPlot()
+#' @export p ggplot object from TSNEplot
+#' @example SplitTSNEPlot(mouse_eyes, split.by = "conditions")
+#' @example SplitTSNEPlot(mouse_eyes, split.by = "Rlbp1", select.plots = c(2,1))
 SplitTSNEPlot <- function(object = mouse_eyes, split.by = "conditions",
                           select.plots = NULL, return.plots = FALSE,
                           do.label = T, group.by = "ident", no.legend = TRUE,
                           pt.size = 1,label.size = 5,... ){
-    "
-    split seurat object by certein criteria, and generate TSNE plot
-    
-    Inputs
-    -------------------
-    object: aligned seurat object with labels at object@meta.data$
-    split.by: the criteria to split
-    range: number of output plots, default is all of them.
-    return.data: TRUE/FASLE, return splited ojbect or not.
-    
-    Outputs
-    --------------------
-    none: print TSNEplot
-    "
-    object.subsets <- SplitCells(object = object, split.by = split.by)
-    conditions <- object.subsets[[length(object.subsets)]] # levels of conditions
+
+    object.subsets <- SplitSeurat(object = object, split.by = split.by)
+    levels <- object.subsets[[length(object.subsets)]]
     
     p <- list()
-    if(is.null(range)) select.plots <- 1:length(conditions)
-    for(i in select.plots){ 
-        p[[i]] <- TSNEPlot(object = object.subsets[[i]],
+    if(is.null(select.plots)) select.plots <- 1:length(levels)
+    for(i in 1:length(select.plots)){ 
+        p[[i]] <- TSNEPlot(object = object.subsets[[select.plots[i]]],
                            do.label = do.label, group.by = group.by, 
                            do.return = T, no.legend = no.legend,
                            pt.size = pt.size,label.size = label.size,...)+
-            ggtitle(conditions[i])+
+            ggtitle(levels[select.plots[i]])+
             theme(text = element_text(size=20),     #larger text including legend title							
                   plot.title = element_text(hjust = 0.5)) #title in middle
     }
     p <- p[lapply(p,length)>0] # remove NULL element
-    if(return.plots) return(p) else print(do.call(plot_grid, p))
+    if(return.plots) return(p) else print(do.call(cowplot::plot_grid, p))
 }
 
 
+#' Generate 3D TSNEplot
+#' @param object Seurat object after performing RunTSNE(dim.embed = 3)
+#' @param ... all other parameters are inherited from Seurat::TSNEPlot()
+#' @export p/p3 ggplot object from TSNEplot
 TSNEPlot.3D <- function (object, reduction.use = "tsne", dim.1 = 1, dim.2 = 2, dim.3 = 3,
           cells.use = NULL, pt.size = 1, do.return = FALSE, do.bare = FALSE, 
           cols.use = NULL, group.by = "ident", pt.shape = NULL, do.hover = FALSE, 
@@ -683,7 +640,7 @@ TSNEPlot.3D <- function (object, reduction.use = "tsne", dim.1 = 1, dim.2 = 2, d
                 stop(paste(reduction.use, "doesn't have the third dimension.
                            Suggest performing RunTSNE(dim.embed = 3)"))
         }
-        cells.use <- SetIfNull(x = cells.use, default = colnames(x = object@data))
+        cells.use <- Seurat:::SetIfNull(x = cells.use, default = colnames(x = object@data))
         dim.code <- GetDimReduction(object = object, reduction.type = reduction.use, 
                                     slot = "key")
         dim.codes <- paste0(dim.code, c(dim.1, dim.2))
@@ -799,6 +756,3 @@ TSNEPlot.3D <- function (object, reduction.use = "tsne", dim.1 = 1, dim.2 = 2, d
                 print(p3)
         }
 }
-#=====Clean memory======================
-#WGCNA::collectGarbage()
-
