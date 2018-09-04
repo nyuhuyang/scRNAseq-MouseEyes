@@ -18,7 +18,7 @@ Move Cell Ranger analysis results into **_data_** folder.
 
 Tree structure of directory:
 <pre>
- |── LICENSE.md<br>
+|── LICENSE.md<br>
 |── R<br>
 |  |── Differential_analysis.R<br>
 |  |── Identify_Cell_Types_Manually.R<br>
@@ -43,8 +43,8 @@ Tree structure of directory:
 |── doc<br>
 |── output<br>
 └── scRNAseq-MouseEyes.Rproj<br>
-<pre>
-<br>
+</pre>
+</li>
 ### 1. Seurat_setup
 <a href="https://github.com/nyuhuyang/scRNAseq-MouseEyes/blob/master/R/Seurat_setup.R">Seurat_setup.R</a></li>
 Unsupervised cell clustering analysis was carried out using the Seurat 2.2 R package. Cells with <500 genes and genes detected within <3 cells were excluded from the analysis. Gene expression raw counts were normalized following a global-scaling normalization method with a scale factor of 10,000 and a log transformation, using the Seurat NormalizeData function. The top 1000 highly variable genes from young C57BL/6J and aged C57BL/6J datasets were selected, followed by canonical correlation analysis (CCA) to identify common sources of variation between the two datasets and minimize the batch effect. The first 20 CCA results were chosen for principal component analysis (PCA). Cells were used for 2-dimensional t-Distributed Stochastic Neighbor Embedding (tSNE) (ref van der maaten and hinton 2008) with 0.8 resolution.
