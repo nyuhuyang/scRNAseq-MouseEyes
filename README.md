@@ -107,6 +107,12 @@ pct.2_UMI is average nUMI of rest of clusters.<br>
 cluster : either cell types or original clusters in `./data/mouse_eyes_alignment.Rda`.
 row.name and gene column are identical.<br>
 
+
+### 4. Main_Figures
+
+<a href="https://github.com/nyuhuyang/scRNAseq-MouseEyes/blob/master/R/Main_Figures.R">Main_Figures.R</a></li>
+Source code to produce all main figures.
+
 ##  
 sessionInfo()
 R version 3.4.4 (2018-03-15)
