@@ -77,23 +77,12 @@ DimHeatmap(object = mouse_eyes, reduction.type = "cca", cells.use = 500, dim.use
 
 #======1.3 align seurat objects =========================
 mouse_eyes <- CalcVarExpRatio(object = mouse_eyes, reduction.type = "pca",
-                              grouping.var = "conditions", dims.use = 1:13)
+                              grouping.var = "conditions", dims.use = 1:11)
 mouse_eyes <- SubsetData(mouse_eyes, subset.name = "var.ratio.pca",accept.low = 0.5)
 #Now we align the CCA subspaces, which returns a new dimensional reduction called cca.aligned
 
 mouse_eyes <- AlignSubspace(object = mouse_eyes, reduction.type = "cca", grouping.var = "conditions", 
-                            dims.align = 1:13)
-#Now we can run a single integrated analysis on all cells!
-mouse_eyes <- RunTSNE(object = mouse_eyes, reduction.use = "cca.aligned", dims.use = 1:13, 
-                      do.fast = TRUE)
-mouse_eyes <- FindClusters(object = mouse_eyes, reduction.type = "cca.aligned", dims.use = 1:13, 
-                           resolution = 0.8, force.recalc = T, save.SNN = TRUE)
-
-p1 <- TSNEPlot(mouse_eyes, do.return = T, pt.size = 1, group.by = "conditions")
-p2 <- TSNEPlot(mouse_eyes, do.label = F, do.return = T, pt.size = 1)
-#png('./output/TSNESplot_alignment.png')
-plot_grid(p1, p2)
-#dev.off()
+                            dims.align = 1:11)
 
 #======1.4 QC ==================================
 mito.genes <- grep(pattern = "^mt-", x = rownames(x = mouse_eyes@data), value = TRUE)
@@ -108,8 +97,23 @@ par(mfrow = c(1, 2))
 GenePlot(object = mouse_eyes, gene1 = "nUMI", gene2 = "percent.mito")
 GenePlot(object = mouse_eyes, gene1 = "nUMI", gene2 = "nGene")
 
-mouse_eyes <- FilterCells(object = mouse_eyes, subset.names = c("nGene", "percent.mito"), 
-                          low.thresholds = c(600, -Inf), high.thresholds = c(5000, 0.10))
+mouse_eyes <- FilterCells(object = mouse_eyes, subset.names = c("nGene","nUMI", "percent.mito"), 
+                          low.thresholds = c(600,1700, -Inf), high.thresholds = c(5000, 0.10))
+
+
+#======1.5 TSNE ==================================
+#Now we can run a single integrated analysis on all cells!
+mouse_eyes <- RunTSNE(object = mouse_eyes, reduction.use = "cca.aligned", dims.use = 1:11, 
+                      do.fast = TRUE)
+mouse_eyes <- FindClusters(object = mouse_eyes, reduction.type = "cca.aligned", dims.use = 1:11, 
+                           resolution = 0.8, force.recalc = T, save.SNN = TRUE)
+
+p1 <- TSNEPlot(mouse_eyes, do.return = T, pt.size = 1, group.by = "conditions")
+p2 <- TSNEPlot(mouse_eyes, do.label = F, do.return = T, pt.size = 1)
+#png('./output/TSNESplot_alignment.png')
+plot_grid(p1, p2)
+#dev.off()
+
 
 #Now, we annotate the clusters as before based on canonical markers.
 #png('./output/TSNEPlot.png')

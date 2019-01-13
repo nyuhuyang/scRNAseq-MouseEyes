@@ -40,7 +40,7 @@ mouse_eyes@ident <- plyr::mapvalues(x = mouse_eyes@ident,
 print("3.1 Compare DE across all major cell types")
 
 # 3.1.2 FindAllMarkers.UMI
-mouse_eyes_Split <- SplitCells(object = mouse_eyes, split.by = "conditions")
+mouse_eyes_Split <- SplitSeurat(object = mouse_eyes, split.by = "conditions")
 mouse_eyes_129_B6 <- mouse_eyes_Split[[1]]
 mouse_eyes_129_B6.gde <- FindAllMarkers.UMI(object = mouse_eyes_129_B6)
 write.csv(x= mouse_eyes_129_B6.gde, file="./output/129_B6.csv")

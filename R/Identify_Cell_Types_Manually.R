@@ -2,9 +2,29 @@ library(Seurat)
 library(dplyr)
 source("./R/Seurat_functions.R")
 
-#====== 2.1 identify phenotype for each cluster  ==========================================
+path <- paste0("./output/",gsub("-","",Sys.Date()),"/")
+if(!dir.exists(path)) dir.create(path, recursive = T)
+
+#====== 2.0 Identify conserved cell type markers========================
 lnames = load(file = "./data/mouse_eyes_alignment.Rda")
 lnames
+
+idents.all <- sort(x = unique(x = mouse_eyes@ident))
+ident.markers <- list()
+for(i in 1:length(idents.all)){
+        ident.markers[[i]] <- FindConservedMarkers(object = mouse_eyes, ident.1 = idents.all[i],
+                                                   logfc.threshold = 0.5, test.use = "bimod",
+                                                   min.pct = 0.25, grouping.var = "conditions")
+        ident.markers[[i]]$gene = rownames(ident.markers[[i]])
+        ident.markers[[i]]$cluster = idents.all[i]
+        
+}
+
+
+mouse_eyes.markers = bind_rows(ident.markers)
+write.csv(mouse_eyes.markers,paste0(path,"mouse_eyes_ConservedMarkers.csv"))
+#====== 2.1 identify phenotype for each cluster  ==========================================
+
 
 Featureplot <- function(x){
     p <- FeaturePlot(object = mouse_eyes, 
@@ -64,6 +84,13 @@ DotPlot(mouse_eyes, genes.plot = rev(markers.to.plot),
 table(mouse_eyes@ident)
 idents <- as.data.frame(table(mouse_eyes@ident))
 old.ident.ids <- idents$Var1
+new.cluster.ids <- c(5,6,3,9,1,2,7,8,11,12,4,13,10)
+mouse_eyes@ident <- plyr::mapvalues(x = mouse_eyes@ident,
+                                    from = old.ident.ids,
+                                    to = new.cluster.ids)
+TSNEPlot(mouse_eyes,do.label = T)
+mouse_eyes <- StashIdent(object = mouse_eyes, save.name = "ClusterNames_0.8")
+mouse_eyes <- SetAllIdent(object = mouse_eyes, save.name = "res.0.8")
 new.cluster.ids <- c("Pericytes 0",
                      "Pericytes 1",
                      "Endothelial cells 2",
@@ -84,31 +111,33 @@ mouse_eyes@ident <- plyr::mapvalues(x = mouse_eyes@ident,
 DotPlot(mouse_eyes, genes.plot = rev(markers.to.plot),
         cols.use = c("blue","red"), x.lab.rot = T, plot.legend = F,
         dot.scale = 8, do.return = T)
-# mouse_eyes <- RenameIdentBack(mouse_eyes)
+
 
 #====== 2.2 dot Plots ==========================================
 lnames = load(file = "./data/mouse_eyes_alignment.Rda")
 lnames
+mouse_eyes <- SetAllIdent(mouse_eyes, id = "res.0.8")
 table(mouse_eyes@ident)
 idents <- as.data.frame(table(mouse_eyes@ident))
 old.ident.ids <- idents$Var1
-new.cluster.ids <- c("Pericytes",
-                     "Pericytes",
+new.cluster.ids <- c("Stromal cells",
+                     "Stromal cells",
                      "Endothelial cells",
                      "Smooth muscle cells",
-                     "Retinal pigment epithelium",
+                     "RPE",
                      "Endothelial cells",
-                     "Pericytes",
-                     "Pericytes",
+                     "Stromal cells",
+                     "Stromal cells",
                      "Hematopoietic cells",
                      "Schwann cells",
                      "Endothelial cells",
                      "Schwann cells",
                      "Melanocytes")
-
+mouse_eyes <- StashIdent(object = mouse_eyes, save.name = "Cell.types")
 mouse_eyes@ident <- plyr::mapvalues(x = mouse_eyes@ident,
                                     from = old.ident.ids,
                                     to = new.cluster.ids)
+
 markers.to.plot <- c(Melanocytes,Myelinating_Schwann_cells,Hematopoietic[1:2],
                      RPE,Smooth_muscle_cells,Endothelium[c(1:3,5,7)],
                      Pericytes[c(4,6:7)],Mesenchymal[c(1,3)])
@@ -126,6 +155,7 @@ table(mouse_eyes@meta.data[, "conditions"])
 #=====2.3 tsne plot=============================
 lnames = load(file = "./data/mouse_eyes_alignment.Rda")
 lnames
+mouse_eyes <- SetAllIdent(object = mouse_eyes, save.name = "res.0.8")
 table(mouse_eyes@ident)
 idents <- as.data.frame(table(mouse_eyes@ident))
 old.ident.ids <- idents$Var1

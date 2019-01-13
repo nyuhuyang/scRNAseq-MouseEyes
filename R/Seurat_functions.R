@@ -31,10 +31,10 @@ FindAllMarkers.UMI <- function (object, genes.use = NULL, logfc.threshold = 0.25
         }, error = function(cond) {
             return(NULL)
         })
-        pct.1_UMI <-rowMeans(as.matrix(x = object@data[, WhichCells(object = object,
-                                                                       ident = idents.all[[i]])]))
-        pct.2_UMI <-rowMeans(as.matrix(x = object@data[, WhichCells(object = object,
-                                                                         ident.remove = idents.all[[i]])]))
+        pct.1_UMI <-rowMeans(expm1(as.matrix(x = object@data[, WhichCells(object = object,
+                                                                       ident = idents.all[[i]])])))
+        pct.2_UMI <-rowMeans(expm1(as.matrix(x = object@data[, WhichCells(object = object,
+                                                                         ident.remove = idents.all[[i]])])))
         avg_UMI[[i]] <-data.frame(pct.1_UMI, pct.2_UMI)
         genes.de[[i]] <- cbind(genes.de[[i]],
                                avg_UMI[[i]][match(rownames(genes.de[[i]]), 
