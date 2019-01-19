@@ -100,7 +100,31 @@ GenePlot(object = mouse_eyes, gene1 = "nUMI", gene2 = "nGene")
 mouse_eyes <- FilterCells(object = mouse_eyes, subset.names = c("nGene","nUMI", "percent.mito"), 
                           low.thresholds = c(600,1700, -Inf), high.thresholds = c(5000, 0.10))
 
+g2 <- lapply(c("nGene", "nUMI", "percent.mito"), function(features){
+        VlnPlot(object = mouse_eyes, features.plot = features, nCol = 3, 
+                point.size.use = 0.2,size.x.use = 10, group.by = "ident",
+                x.lab.rot = T, do.return = T)
+})
+save(g2,file= paste0(path,"g2_2_20180414.Rda"))
 
+jpeg(paste0(path,"/S1_nGene.jpeg"), units="in", width=10, height=7,res=600)
+print(plot_grid(g1[[1]]+ggtitle("nGene in raw data")+ 
+                        scale_y_log10(limits = c(100,10000)),
+                g2[[1]]+ggtitle("nGene after filteration")+ 
+                        scale_y_log10(limits = c(100,10000))))
+dev.off()
+jpeg(paste0(path,"/S1_nUMI.jpeg"), units="in", width=10, height=7,res=600)
+print(plot_grid(g1[[2]]+ggtitle("nUMI in raw data")+ 
+                        scale_y_log10(limits = c(1500,100000)),
+                g2[[2]]+ggtitle("nUMI after filteration")+ 
+                        scale_y_log10(limits = c(1500,100000))))
+dev.off()
+jpeg(paste0(path,"/S1_mito.jpeg"), units="in", width=10, height=7,res=600)
+print(plot_grid(g1[[3]]+ggtitle("mito % in raw data")+ 
+                        ylim(c(0,1)),
+                g2[[3]]+ggtitle("mito % after filteration")+ 
+                        ylim(c(0,1))))
+dev.off()
 #======1.5 TSNE ==================================
 #Now we can run a single integrated analysis on all cells!
 mouse_eyes <- RunTSNE(object = mouse_eyes, reduction.use = "cca.aligned", dims.use = 1:11, 

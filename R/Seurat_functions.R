@@ -1,3 +1,59 @@
+#' a supprting function for SingleFeaturePlot.1 and FeatureHeatmap.1
+#' Change ggplot color scale to increase contrast gradient
+#' #https://github.com/satijalab/seurat/issues/235
+#' @param p ggplot object
+#' @param alpha.use Define transparency of points
+#' @param gradient.use Change fill and colour gradient values
+#' @param scaled.expression.threshold Define lower limit of scaled gene expression level
+#' @export p ggplot object
+ChangeColorScale <- function(p, alpha.use = 0.8,
+                             gradient.use = c("yellow", "red"),
+                             scaled.expression.threshold = 0) {
+        # Order data by scaled gene expresion level
+        # Compute maximum value in gene expression
+        if (length(p$data$scaled.expression)>0){                # FeatureHeatmap.1
+                p$data <- p$data[order(p$data$scaled.expression),]
+                max.scaled.exp <- max(p$data$scaled.expression)
+        } else if (length(p$data$gene)>0){                   # SingleFeaturePlot.1 
+                p$data <- p$data[order(p$data$gene),] 
+                max.scaled.exp <- max(p$data$gene) 
+        }
+        
+        # Define lower limit of scaled gene expression level
+        if (!is.null(scaled.expression.threshold)) {
+                scaled.expression.threshold <- scaled.expression.threshold
+        } else if (is.null(scaled.expression.threshold)) {
+                if (length(p$data$scaled.expression)>0){
+                        scaled.expression.threshold <- min(p$data$scaled.expression)
+                } else if (length(p$data$gene)>0) {
+                        scaled.expression.threshold <- min(p$data$gene)
+                }
+        }
+        
+        # Fill points using the scaled gene expression levels
+        p$layers[[1]]$mapping$fill <- p$layers[[1]]$mapping$colour
+        
+        # Define transparency of points
+        p$layers[[1]]$mapping$alpha <- alpha.use
+        
+        # Change fill and colour gradient values
+        p = p + guides(colour = FALSE)
+        p = p + scale_colour_gradientn(colours = gradient.use, guide = F,
+                                       limits = c(scaled.expression.threshold,
+                                                  max.scaled.exp),
+                                       na.value = "grey") +
+                scale_fill_gradientn(colours = gradient.use,
+                                     name = expression(atop(Scaled, expression)),
+                                     limits = c(scaled.expression.threshold,
+                                                max.scaled.exp),
+                                     na.value = "grey") +
+                scale_alpha_continuous(range = alpha.use, guide = F)
+        
+        # Return plot
+        return(p)
+}
+
+
 #' Combine FindAllMarkers and calculate average UMI
 #' Modified Seurat::FindAllMarkers function to add average UMI for group1 (UMI.1) and group 2 (UMI.2)
 #' @param ... all paramethers are the same as Seurat::FindAllMarkers
@@ -416,30 +472,32 @@ MouseGenes <- function(object, marker.genes, unique =F){
 }
 
 
-# deprecated
-# FeaturePlot doesn't return ggplot (before Seurat_2.1.0, now it returns ggplot)
+# FeaturePlot doesn't return ggplot
 # SingleFeaturePlot doesn't take seurat object as input
 # modified SingleFeaturePlot, take seurat object and return ggplot
-SingleFeaturePlot.1 <- function (object = object, feature = feature, pt.size = 1,
+SingleFeaturePlot.1 <- function (object = object, feature = feature, pt.size = 1.0,
                                  dim.1 = 1, dim.2 = 2,pch.use = 16, cols.use  = c("lightgrey","blue"),
+                                 gradient.use = c("orangered", "red4"),threshold= NULL,text.size=15,
                                  cells.use = NULL,dim.codes, min.cutoff = 0, max.cutoff = Inf,
                                  use.imputed = FALSE, reduction.use = "tsne",no.axes = FALSE, no.legend = TRUE, 
-                                 dark.theme = FALSE, do.return = FALSE) 
+                                 dark.theme = FALSE,title="", do.return = FALSE,x.lim = NULL,
+                                 y.lim = NULL, ...) 
 {
         dim.code <- GetDimReduction(object = object, reduction.type = reduction.use, 
                                     slot = "key")
         dim.codes <- paste0(dim.code, c(dim.1, dim.2))
         data.plot <- as.data.frame(GetCellEmbeddings(object = object,
-                   reduction.type = reduction.use, dims.use = c(dim.1, 
-                        dim.2), cells.use = cells.use))
+                                                     reduction.type = reduction.use, 
+                                                     dims.use = c(dim.1,dim.2), 
+                                                     cells.use = cells.use))
         x1 <- paste0(dim.code, dim.1)
         x2 <- paste0(dim.code, dim.2)
-        data.plot$x <- data.plot[, x1]
-        data.plot$y <- data.plot[, x2]
+        data.plot$x <- data.plot[, grep(x1,colnames(data.plot),value = T)]
+        data.plot$y <- data.plot[, grep(x2,colnames(data.plot),value = T)]
         data.plot$pt.size <- pt.size
         names(x = data.plot) <- c("x", "y")
         data.use <- t(x = FetchData(object = object, vars.all = feature, 
-                                    cells.use = cells.use, use.imputed = use.imputed))
+                                    cells.use = cells.use, use.imputed = use.imputed,...))
         data.gene <- na.omit(object = data.frame(data.use[1,])) # Error in data.use[feature, ] : subscript out of bounds
         min.cutoff <- Seurat:::SetQuantile(cutoff = min.cutoff, data = data.gene)
         max.cutoff <- Seurat:::SetQuantile(cutoff = max.cutoff, data = data.gene)
@@ -471,11 +529,11 @@ SingleFeaturePlot.1 <- function (object = object, feature = feature, pt.size = 1
         if (brewer.gran != 2) {
                 if (length(x = cols.use) == 1) {
                         p <- p + geom_point(mapping = aes(color = col), 
-                                            size = pt.size, shape = pch.use) + scale_color_brewer(palette = cols.use)
+                                            size = pt.size, shape = pch.use)
                 }
                 else {
                         p <- p + geom_point(mapping = aes(color = col), 
-                                            size = pt.size, shape = pch.use) + scale_color_manual(values = cols.use)
+                                            size = pt.size, shape = pch.use)
                 }
         }
         else {
@@ -487,18 +545,19 @@ SingleFeaturePlot.1 <- function (object = object, feature = feature, pt.size = 1
                 }
                 else {
                         p <- p + geom_point(mapping = aes(color = gene), 
-                                            size = pt.size, shape = pch.use) + scale_color_gradientn(colors = cols.use, 
-                                                                                                     guide = guide_colorbar(title = feature))
+                                            size = pt.size, shape = pch.use)
                 }
         }
         if (no.axes) {
                 p <- p + labs(title = feature, x = "", y = "") + theme(axis.line = element_blank(), 
-                                                                       axis.text.x = element_blank(), axis.text.y = element_blank(), 
-                                                                       axis.ticks = element_blank(), axis.title.x = element_blank(), 
+                                                                       axis.text.x = element_blank(), 
+                                                                       axis.text.y = element_blank(), 
+                                                                       axis.ticks = element_blank(), 
+                                                                       axis.title.x = element_blank(), 
                                                                        axis.title.y = element_blank())
         }
         else {
-                p <- p + labs(title = feature, x = dim.codes[1], y = dim.codes[2])
+                p <- p + labs(x = dim.codes[1], y = dim.codes[2])
         }
         if (no.legend) {
                 p <- p + theme(legend.position = "none")
@@ -506,7 +565,18 @@ SingleFeaturePlot.1 <- function (object = object, feature = feature, pt.size = 1
         if (dark.theme) {
                 p <- p + DarkTheme()
         }
-        return(p)
+        p$data <- p$data[order(p$data$gene),]
+        p1 <- ChangeColorScale(p, alpha.use = 1,
+                               scaled.expression.threshold = threshold,
+                               gradient.use = gradient.use)
+        if(!is.null(x.lim)) p1 = p1 + xlim(x.lim)
+        if(!is.null(y.lim)) p1 = p1 + ylim(y.lim)
+        p1 <- p1 +ggtitle(paste0(title,"\n",feature))+
+                theme(text = element_text(size=text.size),     #larger text including legend title							
+                      axis.text.x = element_text(size=text.size*0.8),
+                      axis.text.y = element_text(size=text.size*0.8),
+                      plot.title = element_text(hjust = 0.5,size=text.size*1.5)) #title in middle
+        return(p1)
 }
 
 

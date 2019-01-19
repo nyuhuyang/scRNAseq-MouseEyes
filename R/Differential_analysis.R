@@ -16,7 +16,7 @@ source("./R/Seurat_functions.R")
 
 # 3.1.1 load data
 # Rename ident
-lnames = load(file = "./data/mouse_eyes_alignment.Rda")
+lnames = load(file = "./data/mouse_eyes_CCA_20180414.Rda")
 lnames
 table(mouse_eyes@ident)
 idents <- as.data.frame(table(mouse_eyes@ident))

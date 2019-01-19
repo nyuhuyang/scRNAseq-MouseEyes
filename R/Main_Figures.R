@@ -12,7 +12,7 @@ source("./R/Seurat_functions.R")
 path <- paste0("./output/",gsub("-","",Sys.Date()),"/")
 if(!dir.exists(path)) dir.create(path, recursive = T)
 #========Fig 1b ======================
-lnames = load(file = "./data/mouse_eyes_alignment.Rda")
+lnames = load(file = "./data/mouse_eyes_CCA_20180414.Rda")
 lnames
 mouse_eyes <- SetAllIdent(mouse_eyes, id = "ClusterNames_0.8")
 table(mouse_eyes@ident)
@@ -126,3 +126,28 @@ dev.off()
 
 Hema.gde <- FindAllMarkers.UMI(object = Hema,test.use = "bimod")
 write.csv(x= Hema.gde, file="./output/129_B6_Hematopoietic.csv")
+
+
+#=======================
+# a threshold in the plot, so that cells that express Ihh or Gli1 above that threshold are labeled in purple.
+
+mouse_eyes <- SetAllIdent(mouse_eyes,id = "ClusterNames_0.8")
+TSNEPlot(mouse_eyes, do.label = T)
+RidgePlot(mouse_eyes,features.plot = "Ihh")
+for(i in c(0,0.1,1,2)){
+        print(i)
+        jpeg(paste0(path,"Ihh_tSNE_",i,".jpeg"), units="in", width=10, height=7,res=600)
+        g <- SingleFeaturePlot.1(mouse_eyes,feature = "Ihh",threshold = i,gradient.use = c("lightgrey", "blue"),
+                                 title = paste0("threshold = ",i))
+        print(g)
+        dev.off()
+}
+
+for(i in c(0.5,1,2)){
+        print(i)
+        jpeg(paste0(path,"Gli1_tSNE_",i,".jpeg"), units="in", width=10, height=7,res=600)
+        g <- SingleFeaturePlot.1(mouse_eyes,feature = "Gli1",threshold = i,gradient.use = c("lightgrey", "blue"),
+                                 title = paste0("threshold = ",i))
+        print(g)
+        dev.off()
+}

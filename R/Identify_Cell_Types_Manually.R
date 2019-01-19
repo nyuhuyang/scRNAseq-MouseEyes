@@ -6,7 +6,7 @@ path <- paste0("./output/",gsub("-","",Sys.Date()),"/")
 if(!dir.exists(path)) dir.create(path, recursive = T)
 
 #====== 2.0 Identify conserved cell type markers========================
-lnames = load(file = "./data/mouse_eyes_alignment.Rda")
+lnames = load(file = "./data/mouse_eyes_CCA_20180414.Rda")
 lnames
 
 idents.all <- sort(x = unique(x = mouse_eyes@ident))
