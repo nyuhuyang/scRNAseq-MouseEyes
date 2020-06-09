@@ -3,7 +3,8 @@
 ## SUMMARY
 The activity and survival of retinal photoreceptors depend on support functions performed by the retinal pigment epithelium (RPE) and on oxygen and nutrients delivered by blood vessels in the underlying choroid. By combining single cell and bulk RNA sequencing, we categorized mouse RPE/choroid cell types and characterized the tissue-specific transcriptomic features of choroid endothelial cells. We found that choroid endothelium adjacent to the RPE expresses very high levels of Indian Hedgehog, and identified its downstream target as stromal GLI1+ mesenchymal stem cell-like cells. Genetic impairment of Hedgehog signaling in vivo induced significant loss of choroidal mast cells, as well as an altered inflammatory response and exacerbated visual function defects after retinal damage. Our studies reveal the cellular and molecular landscape of adult RPE/choroid and uncover a Hedgehog-regulated choroidal immunomodulatory signaling circuit. These results open new avenues for the study and treatment of retinal vascular diseases and choroid-related inflammatory blinding disorders.
 
-For more informations please refer to the manuscript: Lehmann GL, Hanke-Gogokhia C, Hu Y, Bareja R, Salfati Z, Ginsberg M, et al. Single-cell profiling reveals an endothelium-mediated immunomodulatory pathway in the eye choroid. Journal of Experimental Medicine. 2020;217(6).
+For more informations please refer to the manuscript: <a href="https://rupress.org/jem/article/217/6/e20190730/151573/Single-cell-profiling-reveals-an-endothelium">Lehmann GL, Hanke-Gogokhia C, Hu Y, Bareja R, Salfati Z, Ginsberg M, et al. Single-cell profiling reveals an endothelium-mediated immunomodulatory pathway in the eye choroid. Journal of Experimental Medicine. 2020;217(6).</a></li>
+
 
 ## Data
 Chromium single-cell RNA-seq outputs were processed by Cell Ranger analysis pipelines. Data is currently unavailable to the public before publication.
